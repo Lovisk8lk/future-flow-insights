@@ -151,12 +151,12 @@ const ExpenseOverviewComponent: React.FC = () => {
               const prevCategory = findPreviousMonthCategory(category.category);
               const percentChange = prevCategory ? getPercentageChange(category.totalAmount, prevCategory.totalAmount) : null;
               return <div key={index} className={`flex items-center p-4 ${index !== filteredMonthData.categories.length - 1 ? "border-b" : ""}`}>
-                        <div className="w-1/4 font-semibold text-xl">{category.category}</div>
+                        <div className="w-1/4 text-md">{category.category}</div>
                         <div className="w-1/2 px-4">
                           <Progress value={category.totalAmount / filteredMonthData.totalAmount * 100} className="h-8 bg-gray-200" />
                         </div>
                         <div className="w-1/4 text-right">
-                          <div className="text-xl font-bold">{category.totalAmount.toFixed(0)} €</div>
+                          <div className="text-md">{category.totalAmount.toFixed(0)} €</div>
                           {percentChange && <div className={getChangeColor(parseFloat(percentChange))}>
                               {parseFloat(percentChange) > 0 ? "+" : ""}
                               {percentChange}%
