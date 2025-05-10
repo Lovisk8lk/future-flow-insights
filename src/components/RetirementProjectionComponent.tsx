@@ -155,10 +155,9 @@ const RetirementProjectionComponent: React.FC = () => {
         <div                       // 👈 make this fill its parent
           style={{
             height: "100%",        //  ✨ add this line
-            maxWidth: "110%",
-            width: "110%",
-            margin: "0 auto",
-            overflow: "hidden"
+            maxWidth: "80%",
+            width: "80%",
+            margin: "0 auto"
           }}
         >
           <ChartContainer config={chartConfig} className="h-full">
