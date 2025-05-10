@@ -101,7 +101,7 @@ const RetirementProjectionComponent: React.FC = () => {
   })();
 
   // Calculate monthly pension amount (divide annual amount by 12)
-  const monthlyPension = inflationAdjustedInterest / (N_RentDuration * 12);
+  const monthlyPension = inflationAdjustedInterest / (N_RentDuration * 12)*1/12;
 
   // Format currency for display
   const formatCurrency = (value: number) => {
