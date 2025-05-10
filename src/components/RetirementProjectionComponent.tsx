@@ -293,7 +293,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
   // Create X-axis ticks for decades only (2030, 2040, etc.)
   const startYear = currentYear;
-  const xAxisTicks = Array.from({ length: 6}, (_, i) => 
+  const xAxisTicks = Array.from({ length: 9}, (_, i) => 
     startYear + i * 10 - ((startYear + i * 10) % 10)
   );
 
