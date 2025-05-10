@@ -55,24 +55,35 @@ const RetirementProjectionComponent: React.FC = () => {
   const yearsToProject = 60; // Project 60 years into the future to cover longer retirement periods
 
   // Prepare data for chart
+  const rentStartIndex = R_RentPayoutStart - currentYear;
+  let g_at_retirement = 0;
+  
+  if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
+    g_at_retirement = P_Deposit * 12 * rentStartIndex * Math.pow(1 + i_payIn/100, rentStartIndex - 1);
+  } else {
+    g_at_retirement = P_Deposit * 12 * (
+      (Math.pow(1 + i_payIn/100, rentStartIndex) - Math.pow(1 + r_MrktRate/100, rentStartIndex)) /
+      (i_payIn/100 - r_MrktRate/100)
+    );
+  }
+  
+  const numerator = i_PayoutIncrease/100 - r_MrktRate/100;
+  const denominator = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1;
+  const C_growth = Math.abs(denominator) < 0.0001 ? g_at_retirement : g_at_retirement * numerator / denominator;
+  
   const chartData = Array(yearsToProject).fill(0).map((_, i) => {
     const year = currentYear + i;
-    const x = i; // Years from now
+    const x = i;
     
-    let f_value = 0;
-    let g_value = 0;
-    let h_value = 0;
+    let f_value = null;
+    let g_value = null;
+    let h_value = null;
     
-    // Function f(x) = P_Deposit * 12 * ((1 + i_payIn)^x - 1) / i_payIn
-    // Domain: x > 0 and x ≤ R_RentPayoutStart
-    if (x > 0 && year <= R_RentPayoutStart) {
+    if (x >= 1 && year <= R_RentPayoutStart) {
       f_value = P_Deposit * 12 * ((Math.pow(1 + i_payIn/100, x) - 1) / (i_payIn/100));
     }
-    
-    // Function g(x) = P_Deposit * 12 * ((1 + i_payIn)^x - (1 + r_MrktRate)^x) / (i_payIn - r_MrktRate)
-    // Domain: x > 0 and x ≤ R_RentPayoutStart
-    if (x > 0 && year <= R_RentPayoutStart) {
-      // Handle the case when i_payIn is very close to r_MrktRate
+  
+    if (x >= 1 && year <= R_RentPayoutStart) {
       if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
         g_value = P_Deposit * 12 * x * Math.pow(1 + i_payIn/100, x - 1);
       } else {
@@ -82,74 +93,21 @@ const RetirementProjectionComponent: React.FC = () => {
         );
       }
     }
-    
-    // Calculate C_growth when we reach retirement start
-    let C_growth = 0;
-    if (year === R_RentPayoutStart) {
-      const rentStartIndex = R_RentPayoutStart - currentYear;
-      let g_at_retirement = 0;
-      
-      // Recalculate g at retirement year
-      if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
-        g_at_retirement = P_Deposit * 12 * rentStartIndex * Math.pow(1 + i_payIn/100, rentStartIndex - 1);
+  
+    if (x >= 1 && year >= R_RentPayoutStart && (year - R_RentPayoutStart) <= N_RentDuration) {
+      const years_since_retirement = year - R_RentPayoutStart;
+      const years_left = N_RentDuration - years_since_retirement;
+  
+      const factor1 = Math.pow(1 + i_PayoutIncrease/100, years_since_retirement);
+      const factor2 = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), years_left) - 1;
+  
+      if (Math.abs(i_PayoutIncrease/100 - r_MrktRate/100) < 0.0001 || Math.abs(factor2) < 0.0001) {
+        h_value = C_growth * (N_RentDuration - years_since_retirement);
       } else {
-        g_at_retirement = P_Deposit * 12 * (
-          (Math.pow(1 + i_payIn/100, rentStartIndex) - Math.pow(1 + r_MrktRate/100, rentStartIndex)) / 
-          (i_payIn/100 - r_MrktRate/100)
-        );
-      }
-      
-      // C_growth formula
-      const numerator = (i_PayoutIncrease/100 - r_MrktRate/100);
-      const denominator = (Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1);
-      
-      // Check for division by zero or very small denominator
-      if (Math.abs(denominator) < 0.0001) {
-        C_growth = g_at_retirement;
-      } else {
-        C_growth = g_at_retirement * numerator / denominator;
-      }
-    }
-    
-    // Function h(x) calculation
-    // h(x) = C_growth * (1 + i_PayoutIncrease)^(x - R_RentPayoutStart) * (((1 + i_PayoutIncrease)/(1 + r_MrktRate))^(N_RentDuration - x + R_RentPayoutStart) - 1) / (i_PayoutIncrease - r_MrktRate)
-    // Domain: x ≥ R_RentPayoutStart and x - R_RentPayoutStart ≤ N_RentDuration
-    if (year >= R_RentPayoutStart && (year - R_RentPayoutStart) <= N_RentDuration) {
-      const rentStartIndex = R_RentPayoutStart - currentYear;
-      let g_at_retirement = 0;
-      
-      // Recalculate g at retirement year for C_growth
-      if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
-        g_at_retirement = P_Deposit * 12 * rentStartIndex * Math.pow(1 + i_payIn/100, rentStartIndex - 1);
-      } else {
-        g_at_retirement = P_Deposit * 12 * (
-          (Math.pow(1 + i_payIn/100, rentStartIndex) - Math.pow(1 + r_MrktRate/100, rentStartIndex)) / 
-          (i_payIn/100 - r_MrktRate/100)
-        );
-      }
-      
-      // Calculate C_growth here
-      const numerator = (i_PayoutIncrease/100 - r_MrktRate/100);
-      const denominator = (Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1);
-      
-      // Prevent division by zero
-      if (Math.abs(denominator) < 0.0001 || Math.abs(numerator) < 0.0001) {
-        C_growth = g_at_retirement;
-        h_value = C_growth * (N_RentDuration - (year - R_RentPayoutStart));
-      } else {
-        C_growth = g_at_retirement * numerator / denominator;
-        
-        // Calculate h(x)
-        const years_since_retirement = year - R_RentPayoutStart;
-        const years_left = N_RentDuration - years_since_retirement;
-        
-        const factor1 = Math.pow(1 + i_PayoutIncrease/100, years_since_retirement);
-        const factor2 = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), years_left) - 1;
-        
         h_value = C_growth * factor1 * factor2 / (i_PayoutIncrease/100 - r_MrktRate/100);
       }
     }
-    
+      
     return {
       year,
       f: f_value,
