@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useFinance } from "../contexts/FinanceContext";
 import { Input } from "./ui/input";
 import { Slider } from "./ui/slider";
-import { ChartContainer, ChartTooltipContent } from "./ui/chart";
+import { ChartContainer, ChartTooltipContent } from "./ui/chart"; 
 
 const RetirementProjectionComponent: React.FC = () => {
   const { retirementData, updateRetirementData } = useFinance();
