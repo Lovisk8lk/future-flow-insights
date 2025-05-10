@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -41,7 +42,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
   const [selectedSubscription, setSelectedSubscription] = useState<string | null>(null);
   const [authorized, setAuthorized] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
-  const subscriptions: Subscription[] = [{
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([{
     name: "Netflix Standard Plan",
     price: "€11.99",
     id: "netflix",
@@ -51,7 +52,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
     price: "€9.99",
     id: "amazon-prime",
     savings: "€25k"
-  }];
+  }]);
 
   // Cache key to identify unique data combinations
   const getCacheKey = () => {
@@ -126,9 +127,11 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
       updateAiSummary();
     }
   }, [data.month, data.totalAmount, previousMonth, transactions]);
+  
   const handleSubscriptionSelect = (id: string) => {
     setSelectedSubscription(id === selectedSubscription ? null : id);
   };
+  
   const handleCancel = async () => {
     if (!selectedSubscription || !authorized) return;
     const subscription = subscriptions.find(s => s.id === selectedSubscription);
@@ -150,6 +153,11 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
           title: "Success",
           description: `Cancellation request sent for your ${subscription.name}.`
         });
+
+        // Remove the cancelled subscription from the list
+        setSubscriptions(prevSubscriptions => 
+          prevSubscriptions.filter(sub => sub.id !== selectedSubscription)
+        );
 
         // Reset state
         setSelectedSubscription(null);
@@ -204,25 +212,43 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
               Adjust your monthly budget targets based on AI recommendations or cancel subscriptions.
             </p>
             <div className="space-y-3 py-0">
-              {/* Subscription Cards */}
-              {subscriptions.map(subscription => <div key={subscription.id} className={`bg-white p-3 rounded-lg cursor-pointer transition-colors ${selectedSubscription === subscription.id ? 'ring-2 ring-black' : 'hover:bg-gray-50'}`} onClick={() => handleSubscriptionSelect(subscription.id)}>
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium text-base">{subscription.name}</h4>
-                    <p className="text-sm font-medium">{subscription.price}</p>
+              {/* Subscription Cards - Only show non-cancelled subscriptions */}
+              {subscriptions.length > 0 ? (
+                subscriptions.map(subscription => (
+                  <div 
+                    key={subscription.id} 
+                    className={`bg-white p-3 rounded-lg cursor-pointer transition-colors ${selectedSubscription === subscription.id ? 'ring-2 ring-black' : 'hover:bg-gray-50'}`} 
+                    onClick={() => handleSubscriptionSelect(subscription.id)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium text-base">{subscription.name}</h4>
+                      <p className="text-sm font-medium">{subscription.price}</p>
+                    </div>
+                    <p className="text-xs text-green-600 font-semibold">Worth {subscription.savings} at Retirement</p>
                   </div>
-                  <p className="text-xs text-green-600 font-semibold">Worth {subscription.savings} at Retirement</p>
-                </div>)}
+                ))
+              ) : (
+                <div className="bg-white p-3 rounded-lg text-center">
+                  <p className="text-gray-500">No active subscriptions found.</p>
+                </div>
+              )}
               
-              {/* Authorization Checkbox */}
-              <div className="mt-4 flex items-start space-x-2 py-0 my-[15px]">
-                <Checkbox id="authorize" checked={authorized} onCheckedChange={checked => setAuthorized(checked === true)} className="mt-1" />
-                <label htmlFor="authorize" className="text-xs text-gray-700">
-                  I authorize this app to cancel the selected subscriptions on my behalf and confirm I am the account holder.
-                </label>
-              </div>
+              {/* Authorization Checkbox - Only show if there are subscriptions */}
+              {subscriptions.length > 0 && (
+                <div className="mt-4 flex items-start space-x-2 py-0 my-[15px]">
+                  <Checkbox id="authorize" checked={authorized} onCheckedChange={checked => setAuthorized(checked === true)} className="mt-1" />
+                  <label htmlFor="authorize" className="text-xs text-gray-700">
+                    I authorize this app to cancel the selected subscriptions on my behalf and confirm I am the account holder.
+                  </label>
+                </div>
+              )}
               
-              {/* Cancel Button */}
-              <Button onClick={handleCancel} disabled={!selectedSubscription || !authorized || isCancelling} className="w-full mt-4 bg-black hover:bg-gray-800 my-0">
+              {/* Cancel Button - Only enable if there are subscriptions */}
+              <Button 
+                onClick={handleCancel} 
+                disabled={!selectedSubscription || !authorized || isCancelling || subscriptions.length === 0} 
+                className="w-full mt-4 bg-black hover:bg-gray-800 my-0"
+              >
                 {isCancelling ? "Cancelling..." : "Cancel Subscription"}
               </Button>
             </div>
