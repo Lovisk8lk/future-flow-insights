@@ -29,7 +29,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
   
   return (
     <>
-      <Card className="bg-finance-gray rounded-xl overflow-hidden">
+      <Card className="bg-finance-gray rounded-xl overflow-hidden" id="expense-intelligence-card">
         <div className="flex items-center gap-3 p-4 border-b border-gray-200">
           <div className="flex-shrink-0">
             <div className="bg-black p-2 rounded-md">
@@ -56,7 +56,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-finance-gray border-none">
+        <DialogContent className="bg-finance-gray border-none w-full max-w-none sm:max-w-[calc(100vw-2rem)] md:max-w-[500px] lg:max-w-[550px] min-h-[450px]">
           <DialogHeader>
             <DialogTitle>Refine Your Budget</DialogTitle>
           </DialogHeader>
@@ -72,6 +72,29 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
                   <p className="text-sm text-gray-500">Current spending: €{category.totalAmount.toFixed(0)}</p>
                 </div>
               ))}
+            </div>
+            
+            <div className="mt-6">
+              <h4 className="font-medium mb-2">Your Targets</h4>
+              <div className="space-y-2">
+                {data.categories.slice(0, 3).map((category, index) => (
+                  <div key={index} className="bg-white p-3 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium">{category.category}</h4>
+                      <p className="text-sm font-medium">€{Math.round(category.totalAmount * 0.9)}</p>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Recommended: 10% reduction</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="mt-8">
+              <button
+                className="w-full bg-black text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+              >
+                Save Budget Targets
+              </button>
             </div>
           </div>
         </DialogContent>
