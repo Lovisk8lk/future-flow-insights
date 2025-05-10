@@ -7,6 +7,8 @@ import { ChartContainer, ChartTooltipContent } from "./ui/chart";
 import { Card } from "./ui/card";
 import { Separator } from "./ui/separator";
 import { Link } from "react-router-dom";
+import { Button } from "./ui/button";
+import { ArrowRight } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -424,6 +426,31 @@ const RetirementProjectionComponent: React.FC = () => {
           <div className="text-xs text-[#8A898C]">
             Approximation based on average market returns and current monthly deposits under assumed growth rate
           </div>
+        </div>
+      </Card>
+      
+      {/* Trade Republic style CTA card */}
+      <Card className="mb-6 bg-white border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+        <div className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between">
+          <div className="flex items-start space-x-3">
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-50 text-blue-600">
+              <span className="text-lg">💡</span>
+            </div>
+            <div>
+              <h4 className="text-sm font-medium text-black mb-1">Boost your retirement</h4>
+              <p className="text-xs text-gray-600">
+                Save <span className="font-medium">{firstExpenseAmount > 0 ? formatCurrency(potentialMonthlySavings) : '€50'}</span> monthly from expenses to gain <span className="font-medium">{formatCurrency(potentialIncrease)}</span>
+              </p>
+            </div>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="mt-3 md:mt-0 text-xs border border-gray-200 hover:bg-gray-50 hover:text-black transition-all" 
+            onClick={handleExpensesLinkClick}
+          >
+            View expenses <ArrowRight className="ml-1 h-3 w-3" />
+          </Button>
         </div>
       </Card>
       
