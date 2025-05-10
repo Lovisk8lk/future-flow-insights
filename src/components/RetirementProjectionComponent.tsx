@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
@@ -7,9 +6,10 @@ import { Slider } from "./ui/slider";
 import { ChartContainer, ChartTooltipContent } from "./ui/chart";
 import { Card } from "./ui/card";
 import { Separator } from "./ui/separator";
+import { Link } from "react-router-dom";
 
 const RetirementProjectionComponent: React.FC = () => {
-  const { retirementData, updateRetirementData } = useFinance();
+  const { retirementData, updateRetirementData, expenses, setActiveTab } = useFinance();
   const { 
     monthlyDeposit: P_Deposit, 
     depositGrowthRate: i_payIn,
@@ -87,6 +87,13 @@ const RetirementProjectionComponent: React.FC = () => {
   // Calculate monthly pension amount (divide annual amount by 12)
   const monthlyPension = inflationAdjustedInterest / (N_RentDuration * 12)*1/12;
 
+  // Get first expense category amount for the message
+  const firstExpenseAmount = expenses.categories.length > 0 ? expenses.categories[0].amount : 0;
+  
+  // Calculate potential wealth increase (simple estimate - 10% of first expense saved over years until retirement)
+  const potentialMonthlySavings = Math.round(firstExpenseAmount * 0.1);
+  const potentialIncrease = Math.round(potentialMonthlySavings * 12 * (R_RentPayoutStart - currentYear) * (1 + r_MrktRate/100));
+
   // Format currency for display
   const formatCurrency = (value: number) => {
     if (value >= 1000000) {
@@ -97,6 +104,13 @@ const RetirementProjectionComponent: React.FC = () => {
     return `€${value.toFixed(2)}`;
   };
 
+  // Handle click on the expenses link
+  const handleExpensesLinkClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setActiveTab("expenses");
+  };
+
+  // Prepare data for chart
   const chartData = Array(yearsToProject).fill(0).map((_, i) => {
     const year = currentYear + i;
     const x = i;
@@ -256,6 +270,19 @@ const RetirementProjectionComponent: React.FC = () => {
 
   return (
     <div className="flex flex-col px-5 py-4">
+      {/* Add the new message with link to expenses */}
+      <div className="mb-4 text-sm text-gray-700">
+        By saving {firstExpenseAmount > 0 ? `${firstExpenseAmount}€` : 'more'} from your{' '}
+        <a 
+          href="#" 
+          onClick={handleExpensesLinkClick}
+          className="text-blue-500 underline hover:text-blue-700"
+        >
+          Expenses
+        </a>, 
+        you can increase your wealth at retirement by approximately {formatCurrency(potentialIncrease)}
+      </div>
+      
       <div className="h-96 mb-5">
         <div                       
           style={{
@@ -391,4 +418,3 @@ const RetirementProjectionComponent: React.FC = () => {
 };
 
 export default RetirementProjectionComponent;
-
