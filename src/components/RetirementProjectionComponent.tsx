@@ -205,6 +205,7 @@ const RetirementProjectionComponent: React.FC = () => {
   const values = chartData.flatMap(d => [d.f, d.g, d.h]);
   const maxValue = Math.max(...values.filter(v => !isNaN(v) && isFinite(v)));
   const roundedMax = Math.ceil(maxValue / 1000) * 1000;
+  const extendedMax = roundedMax * 1.1;    // 10 % over the real max
   
   // Y-axis animation logic with delay
   useEffect(() => {
@@ -213,10 +214,10 @@ const RetirementProjectionComponent: React.FC = () => {
       previousMaxRef.current = roundedMax;
       setYAxisAnimatedMax(roundedMax);
       setYAxisTicks([
-        Math.round(roundedMax / 4),
-        Math.round(roundedMax / 2),
-        Math.round(roundedMax * 3 / 4),
-        roundedMax
+        Math.round(extendedMax / 4),
+        Math.round(extendedMax / 2),
+        Math.round(extendedMax * 3 / 4),
+        Math.round(extendedMax)               // top tick = new axis top
       ]);
       return;
     }
@@ -294,7 +295,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
   // Create X-axis ticks for decades only (2030, 2040, etc.)
   const startYear = currentYear;
-  const xAxisTicks = Array.from({ length: 6}, (_, i) => 
+  const xAxisTicks = Array.from({ length: 7}, (_, i) => 
     startYear + i * 10 - ((startYear + i * 10) % 10)
   );
 
@@ -342,15 +343,16 @@ const RetirementProjectionComponent: React.FC = () => {
                   tickLine={false}
                   axisLine={false}
                 />
-                <YAxis 
+                <YAxis
                   tick={{ fontSize: 10 }}
                   ticks={yAxisTicks}
                   tickFormatter={formatYAxis}
                   tickLine={false}
                   axisLine={false}
                   orientation="right"
-                  domain={[0, yAxisAnimatedMax || roundedMax]}
-                  allowDataOverflow={true}
+                  /** ⬇️  old: domain={[0, yAxisAnimatedMax || roundedMax]} */
+                  domain={[0, (yAxisAnimatedMax || roundedMax) * 1.1]}
+                  allowDataOverflow
                 />
                 <Tooltip content={<ChartTooltipContent />} />
                 <Line 
