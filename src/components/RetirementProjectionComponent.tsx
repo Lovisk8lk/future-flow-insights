@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
@@ -151,10 +152,11 @@ const RetirementProjectionComponent: React.FC = () => {
 
   return (
     <div className="flex flex-col px-5 py-5">
-      <div className="h-64 mb-6">
+      {/* Modified chart container with aspect ratio of 1:2.5 (width to height) */}
+      <div className="w-full" style={{ height: "calc(100vw * 0.7)", maxHeight: "700px", minHeight: "400px" }}>
         <ChartContainer config={chartConfig}>
-          <ResponsiveContainer width="10%" height="100%">
-            <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 15 }}>
               <CartesianGrid 
                 horizontal={true}
                 vertical={false}
@@ -220,7 +222,7 @@ const RetirementProjectionComponent: React.FC = () => {
         </ChartContainer>
       </div>
       
-      <div className="space-y-6">
+      <div className="space-y-6 mt-6">
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Monthly Deposit (P_Deposit): €{P_Deposit}</label>
