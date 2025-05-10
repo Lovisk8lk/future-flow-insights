@@ -75,14 +75,6 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
                 </div>
               ))}
             </div>
-            
-            <div className="mt-4">
-              <button
-                className="w-full bg-black text-white py-2 px-4 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors"
-              >
-                Save Budget Targets
-              </button>
-            </div>
           </div>
         </DialogContent>
       </Dialog>
