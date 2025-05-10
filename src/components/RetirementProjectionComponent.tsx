@@ -152,7 +152,7 @@ const RetirementProjectionComponent: React.FC = () => {
   return (
     <div className="mb-8">               {/* no fixed height needed here */}
       <ChartContainer config={chartConfig}>
-        <ResponsiveContainer width="100%" height={420}>   {/* 👈 420 px tall */}
+        <ResponsiveContainer width="100%" aspect={0.6}>   {/* 👈 420 px tall */}
           <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
               <CartesianGrid 
                 horizontal={true}
