@@ -4,12 +4,15 @@ import { fetchExpensesByUserId, ExpenseTransaction, groupExpensesByMonthAndCateg
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import ExpenseAiSummary from "./ExpenseAiSummary";
+
 type MonthOption = {
   year: number;
   month: number;
   label: string;
   value: string;
 };
+
 type MonthCategorySummary = {
   month: string;
   monthKey: string;
@@ -20,6 +23,7 @@ type MonthCategorySummary = {
     transactions: ExpenseTransaction[];
   }[];
 };
+
 const ExpenseOverviewComponent: React.FC = () => {
   const {
     expenses
@@ -31,6 +35,7 @@ const ExpenseOverviewComponent: React.FC = () => {
   const [previousMonth, setPreviousMonth] = useState<MonthCategorySummary | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const userId = "25e3564c-8bb9-4fdd-9dd7-cf0ec8c54c28";
+
   useEffect(() => {
     const loadExpenses = async () => {
       setLoading(true);
@@ -54,6 +59,7 @@ const ExpenseOverviewComponent: React.FC = () => {
     };
     loadExpenses();
   }, []);
+
   useEffect(() => {
     // Find the previous month data for comparison
     if (selectedMonth && monthCategoryGroups.length > 1) {
@@ -76,6 +82,7 @@ const ExpenseOverviewComponent: React.FC = () => {
       }
     }
   }, [selectedMonth, monthCategoryGroups]);
+
   const handleMonthChange = (value: string) => {
     setSelectedMonth(value);
   };
@@ -148,7 +155,10 @@ const ExpenseOverviewComponent: React.FC = () => {
                   </div>
                 </div>
                 
-                <Card className="overflow-hidden">
+                {/* Add AI Summary component here */}
+                <ExpenseAiSummary data={filteredMonthData} previousMonth={previousMonth} />
+                
+                <Card className="overflow-hidden mt-6">
                   {filteredMonthData.categories.map((category, index) => {
               const prevCategory = findPreviousMonthCategory(category.category);
               const percentChange = prevCategory ? getPercentageChange(category.totalAmount, prevCategory.totalAmount) : null;
@@ -172,4 +182,5 @@ const ExpenseOverviewComponent: React.FC = () => {
         </>}
     </div>;
 };
+
 export default ExpenseOverviewComponent;

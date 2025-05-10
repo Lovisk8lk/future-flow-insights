@@ -66,7 +66,8 @@ export default {
 				finance: {
 					blue: '#4097FF',
 					green: '#25D366',
-					gray: '#F5F5F7'
+					gray: '#F5F5F7',
+					black: '#000000'
 				}
 			},
 			borderRadius: {
