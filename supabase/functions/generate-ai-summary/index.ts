@@ -24,12 +24,11 @@ Analyze the attached customer transaction data to pinpoint under-used, duplicati
 
 Output:
 A single, concise, upbeat in-app message that:
-1.	Encourages the user by highlighting a positive recent spending habit (no numbers).
-2.	Drives action by naming one specific low-value subscription to cancel and hinting at its long-term benefit (e.g. “Canceling [Service] could free up €X/month NOW to grow into €Y in Z years!”).
 
-Constraints:
-1. Look out for similar services in a singe domain which could be reduced to just one subscription or service.
-2. Examples include excessive spending for e.g. transportantion (suggestion to buy certain bus tickets), Prime and Netflix, and Apple Music and Spotify
+1. Encourages the user by highlighting a positive recent spending habit (no numbers).
+2. Drives action by naming one specific low-value subscription to cancel and hinting at its long-term benefit (e.g. “Canceling [Service] could free up €X/month NOW to grow into €Y in Z years!”).
+
+Tone: Friendly, empowering, action-oriented, and urgent—celebrate progress and spotlight opportunity.
 
 Monthly Data:
 - Month: ${monthData.month || 'Current Month'}
