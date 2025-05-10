@@ -45,9 +45,6 @@ const RetirementProjectionComponent: React.FC = () => {
   // Create local state for the input field to handle changes
   const [depositInputValue, setDepositInputValue] = useState(P_Deposit.toString());
   
-  // Enhanced monthly deposit amount (original + €15)
-  const enhancedMonthlyDeposit = P_Deposit + 15;
-  
   useEffect(() => {
     // Ensure retirementDuration is set if it doesn't exist
     if (retirementData.retirementDuration === undefined) {
@@ -101,9 +98,8 @@ const RetirementProjectionComponent: React.FC = () => {
   // Prepare data for chart
   const rentStartIndex = R_RentPayoutStart - currentYear;
   
-  // Store the wealth value at retirement for normal and enhanced scenarios
+  // Store the wealth value at retirement
   let wealthAtRetirement = 0;
-  let enhancedWealthAtRetirement = 0;
   
   // Prepare data for chart with initialCapital as starting point
   const chartData = Array.from({ length: yearsToProject }, (_, i) => {
@@ -113,14 +109,11 @@ const RetirementProjectionComponent: React.FC = () => {
     let f_value = null; // Invested Capital
     let g_value = null; // Wealth
     let h_value = null; // Remaining Pension
-    let g_prime_value = null; // Enhanced Wealth (+15€)
-    let h_prime_value = null; // Enhanced Remaining Pension (+15€)
     
     // For the very first year (current year), set the initial values to initialCapital
     if (x === 0) {
       f_value = initialCapital;
       g_value = initialCapital;
-      g_prime_value = initialCapital;
     } else if (year <= R_RentPayoutStart) {
       // Invested Capital calculation - starts from initialCapital
       f_value = initialCapital + P_Deposit * 12 * ((Math.pow(1 + i_payIn/100, x) - 1) / (i_payIn/100));
@@ -129,29 +122,17 @@ const RetirementProjectionComponent: React.FC = () => {
       if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
         g_value = initialCapital * Math.pow(1 + r_MrktRate/100, x) + 
                  P_Deposit * 12 * x * Math.pow(1 + i_payIn/100, x - 1);
-        
-        // Enhanced Wealth calculation (with +15€)
-        g_prime_value = initialCapital * Math.pow(1 + r_MrktRate/100, x) + 
-                       enhancedMonthlyDeposit * 12 * x * Math.pow(1 + i_payIn/100, x - 1);
       } else {
         g_value = initialCapital * Math.pow(1 + r_MrktRate/100, x) + 
                  P_Deposit * 12 * (
                    (Math.pow(1 + i_payIn/100, x) - Math.pow(1 + r_MrktRate/100, x)) / 
                    (i_payIn/100 - r_MrktRate/100)
                  );
-                 
-        // Enhanced Wealth calculation (with +15€)
-        g_prime_value = initialCapital * Math.pow(1 + r_MrktRate/100, x) + 
-                       enhancedMonthlyDeposit * 12 * (
-                         (Math.pow(1 + i_payIn/100, x) - Math.pow(1 + r_MrktRate/100, x)) / 
-                         (i_payIn/100 - r_MrktRate/100)
-                       );
       }
       
       // Store the wealth value at retirement
       if (year === R_RentPayoutStart) {
         wealthAtRetirement = g_value;
-        enhancedWealthAtRetirement = g_prime_value;
       }
     }
     
@@ -160,10 +141,9 @@ const RetirementProjectionComponent: React.FC = () => {
       const years_since_retirement = year - R_RentPayoutStart;
       const years_left = N_RentDuration - years_since_retirement;
       
-      // Regular pension calculations
+      // Use the actual wealth value at retirement for pension calculations
       if (years_since_retirement === 0) {
         h_value = wealthAtRetirement;
-        h_prime_value = enhancedWealthAtRetirement;
       } else {
         const factor1 = Math.pow(1 + i_PayoutIncrease/100, years_since_retirement);
         const factor2 = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), years_left) - 1;
@@ -171,23 +151,14 @@ const RetirementProjectionComponent: React.FC = () => {
         // Calculate C_growth based on wealthAtRetirement
         const numerator = i_PayoutIncrease/100 - r_MrktRate/100;
         const denominator = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1;
-        
-        // Regular pension
         const C_growth = Math.abs(denominator) < 0.0001 ? 
                          wealthAtRetirement : 
                          wealthAtRetirement * numerator / denominator;
         
-        // Enhanced pension
-        const C_growth_prime = Math.abs(denominator) < 0.0001 ? 
-                              enhancedWealthAtRetirement : 
-                              enhancedWealthAtRetirement * numerator / denominator;
-        
         if (Math.abs(i_PayoutIncrease/100 - r_MrktRate/100) < 0.0001 || Math.abs(factor2) < 0.0001) {
           h_value = C_growth * (N_RentDuration - years_since_retirement);
-          h_prime_value = C_growth_prime * (N_RentDuration - years_since_retirement);
         } else {
           h_value = C_growth * factor1 * factor2 / (i_PayoutIncrease/100 - r_MrktRate/100);
-          h_prime_value = C_growth_prime * factor1 * factor2 / (i_PayoutIncrease/100 - r_MrktRate/100);
         }
       }
     }
@@ -197,8 +168,6 @@ const RetirementProjectionComponent: React.FC = () => {
       f: f_value !== null ? Math.round(f_value) : null,
       g: g_value !== null ? Math.round(g_value) : null,
       h: h_value !== null ? Math.round(h_value) : null,
-      g_prime: g_prime_value !== null ? Math.round(g_prime_value) : null,
-      h_prime: h_prime_value !== null ? Math.round(h_prime_value) : null,
     };
   });
 
@@ -214,23 +183,8 @@ const RetirementProjectionComponent: React.FC = () => {
     return wealthAtRetirement * (adjustedNumerator / adjustedDenominator);
   })();
 
-  // Calculate enhanced monthly pension amount
-  const enhancedInflationAdjustedInterest = (() => {
-    if (Math.abs(i_PayoutIncrease - r_MrktRate) < 0.0001) {
-      return enhancedWealthAtRetirement * N_RentDuration;
-    }
-    
-    const adjustedNumerator = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1;
-    const adjustedDenominator = i_PayoutIncrease/100 - r_MrktRate/100;
-    
-    return enhancedWealthAtRetirement * (adjustedNumerator / adjustedDenominator);
-  })();
-
   // Calculate monthly pension amount (divide annual amount by 12)
   const monthlyPension = inflationAdjustedInterest / (N_RentDuration * 12) * 1/12;
-  
-  // Calculate enhanced monthly pension amount
-  const enhancedMonthlyPension = enhancedInflationAdjustedInterest / (N_RentDuration * 12) * 1/12;
 
   // Get first expense category amount for the message
   const firstExpenseAmount = expenses.categories.length > 0 ? expenses.categories[0].amount : 0;
@@ -239,8 +193,8 @@ const RetirementProjectionComponent: React.FC = () => {
   const potentialMonthlySavings = Math.round(firstExpenseAmount * 0.1);
   const potentialIncrease = Math.round(potentialMonthlySavings * 12 * (R_RentPayoutStart - currentYear) * (1 + r_MrktRate/100));
 
-  // Find max value for Y-axis including the enhanced projections
-  const values = chartData.flatMap(d => [d.f, d.g, d.h, d.g_prime, d.h_prime]);
+  // Find max value for Y-axis
+  const values = chartData.flatMap(d => [d.f, d.g, d.h]);
   const maxValue = Math.max(...values.filter(v => !isNaN(v) && isFinite(v)));
   const roundedMax = Math.ceil(maxValue / 1000) * 1000;
 
@@ -366,8 +320,6 @@ const RetirementProjectionComponent: React.FC = () => {
     f: { color: "#132676", label: "Invested Capital" },
     g: { color: "#2cde76", label: "Wealth" },
     h: { color: "#727272", label: "Remaining Pension" },
-    g_prime: { color: "#cfecdc", label: "Wealth (+€15)" },
-    h_prime: { color: "#ededed", label: "Remaining Pension (+€15)" },
   };
 
   return (
@@ -394,8 +346,8 @@ const RetirementProjectionComponent: React.FC = () => {
                 />
                 <XAxis
                   dataKey="year"
-                  type="number"                              
-                  domain={[currentYear, lastYearToDisplay]}  
+                  type="number"                              /* NEW */
+                  domain={[currentYear, lastYearToDisplay]}  /* NEW */
                   tick={{ fontSize: 10 }}
                   ticks={xAxisTicks}
                   tickLine={false}
@@ -459,40 +411,9 @@ const RetirementProjectionComponent: React.FC = () => {
                   animationDuration={1000}
                   animationEasing="ease-in-out"
                 />
-                {/* New enhanced wealth line (g_prime) */}
-                <Line 
-                  type="monotone" 
-                  dataKey="g_prime" 
-                  stroke="#cfecdc" 
-                  strokeWidth={3}
-                  dot={false} 
-                  activeDot={{ r: 6, fill: "#cfecdc", stroke: "#fff" }} 
-                  name="g_prime"
-                  animationDuration={1000}
-                  animationEasing="ease-in-out"
-                >
-                  <Label 
-                    value="Wealth (+€15)" 
-                    position="top" 
-                    offset={10}
-                    style={{ fontSize: 11, fill: "#cfecdc", fontWeight: 500 }}
-                  />
-                </Line>
-                {/* New enhanced pension line (h_prime) */}
-                <Line 
-                  type="monotone" 
-                  dataKey="h_prime" 
-                  stroke="#ededed" 
-                  strokeWidth={3}
-                  dot={false} 
-                  activeDot={{ r: 6, fill: "#ededed", stroke: "#fff" }} 
-                  name="h_prime"
-                  animationDuration={1000}
-                  animationEasing="ease-in-out"
-                />
                 <ReferenceLine 
                   x={R_RentPayoutStart}
-                  stroke="#727272" 
+                  stroke="#444444" 
                   strokeDasharray="3 3" 
                   label={{ 
                     value: 'Retirement', 
@@ -507,24 +428,13 @@ const RetirementProjectionComponent: React.FC = () => {
         </div>
       </div>
       
-      {/* Trade Republic style minimalistic card showing both pension values */}
+      {/* Trade Republic style minimalistic card */}
       <Card className="mb-6 bg-white border-gray-100 shadow-sm">
         <div className="p-5">
-          <div className="flex flex-col md:flex-row justify-between">
-            <div className="flex flex-col space-y-1 mb-4 md:mb-0">
-              <div className="text-sm font-normal text-[#403E43]">Expected Monthly Pension</div>
-              <div className="text-2xl font-semibold text-[#221F26]">
-                {formatCurrency(monthlyPension)}
-              </div>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <div className="text-sm font-normal text-[#403E43]">With +€15 Monthly</div>
-              <div className="text-2xl font-semibold text-[#ffc107]">
-                {formatCurrency(enhancedMonthlyPension)}
-                <span className="text-sm text-green-500 ml-2">
-                  +{formatCurrency(enhancedMonthlyPension - monthlyPension)}
-                </span>
-              </div>
+          <div className="flex flex-col space-y-1">
+            <div className="text-sm font-normal text-[#403E43]">Expected Monthly Pension</div>
+            <div className="text-2xl font-semibold text-[#221F26]">
+              {formatCurrency(monthlyPension)}
             </div>
           </div>
           <Separator className="my-3 bg-gray-100" />
