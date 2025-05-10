@@ -183,7 +183,7 @@ const RetirementProjectionComponent: React.FC = () => {
                 type="monotone" 
                 dataKey="f" 
                 stroke="#132676" 
-                strokeWidth={2}
+                strokeWidth={3.5}
                 dot={false} 
                 activeDot={{ r: 6, fill: "#0000FF", stroke: "#fff" }} 
                 name="f"
@@ -192,7 +192,7 @@ const RetirementProjectionComponent: React.FC = () => {
                 type="monotone" 
                 dataKey="g" 
                 stroke="#2cde76" 
-                strokeWidth={5}
+                strokeWidth={3.5}
                 dot={false} 
                 activeDot={{ r: 6, fill: "#2cde76", stroke: "#fff" }} 
                 name="g"
@@ -201,7 +201,7 @@ const RetirementProjectionComponent: React.FC = () => {
                 type="monotone" 
                 dataKey="h" 
                 stroke="#000000" 
-                strokeWidth={2}
+                strokeWidth={3.5}
                 dot={false} 
                 activeDot={{ r: 6, fill: "#000000", stroke: "#fff" }} 
                 name="h"
