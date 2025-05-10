@@ -35,6 +35,15 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
   
   useEffect(() => {
     const fetchAiSummary = async () => {
+      // Check if we already have a cached summary in the session
+      const cachedSummary = sessionStorage.getItem('aiSummary');
+      
+      if (cachedSummary) {
+        console.log("Using cached AI summary from session storage");
+        setAiSummary(cachedSummary);
+        return;
+      }
+      
       setIsLoading(true);
       setError(null);
       try {
@@ -48,6 +57,11 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
         
         if (functionError) {
           throw new Error('Failed to fetch AI summary: ' + functionError.message);
+        }
+        
+        // Cache the generated text in session storage
+        if (result.generatedText) {
+          sessionStorage.setItem('aiSummary', result.generatedText);
         }
         
         setAiSummary(result.generatedText);
@@ -67,7 +81,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
     };
     
     fetchAiSummary();
-  }, [data.monthKey]); // Re-fetch when month changes
+  }, []); // Only run once per session, not when month changes
   
   // Fallback text to use when AI generation fails
   const fallbackText = `Excellent expense management! Your spending this month shows consistent discipline in major categories.
