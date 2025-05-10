@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
@@ -240,7 +239,7 @@ const RetirementProjectionComponent: React.FC = () => {
           }}
         >
           <ChartContainer config={chartConfig} className="h-full">
-            <ResponsiveContainer width="100%" length="100%">
+            <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 5, right: 260, left: 15, bottom: 5 }}>
                 <CartesianGrid 
                   horizontal={true}
