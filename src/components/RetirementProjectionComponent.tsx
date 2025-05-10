@@ -15,7 +15,7 @@ const RetirementProjectionComponent: React.FC = () => {
     retirementGrowthRate: i_PayoutIncrease,
     retirementDuration: N_RentDuration = 30 // Default value if not already in context
   } = retirementData;
-
+ 
   useEffect(() => {
     // Ensure retirementDuration is set if it doesn't exist
     if (retirementData.retirementDuration === undefined) {
