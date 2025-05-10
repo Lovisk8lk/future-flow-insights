@@ -308,24 +308,6 @@ const RetirementProjectionComponent: React.FC = () => {
 
   return (
     <div className="flex flex-col px-5 py-4">
-      {/* Message card placed between pension and sliders */}
-      <Card className="mb-6 py-2 px-3 bg-gradient-to-r from-gray-50 to-white border-gray-100">
-        <div className="flex items-center text-xs font-medium text-gray-800">
-          <span className="mr-1">💡</span>
-          <span>
-            Save <span className="font-bold">{firstExpenseAmount > 0 ? `${formatCurrency(firstExpenseAmount)}` : 'more'}</span> from your{' '}
-            <a 
-              href="#" 
-              onClick={handleExpensesLinkClick}
-              className="font-bold text-black hover:underline"
-            >
-              Expenses
-            </a>{' '}
-            to increase retirement wealth by <span className="font-bold">{formatCurrency(potentialIncrease)}</span>
-          </span>
-        </div>
-      </Card>
-      
       <div className="h-96 mb-5">
         <div                       
           style={{
