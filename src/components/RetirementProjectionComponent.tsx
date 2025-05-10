@@ -219,7 +219,6 @@ const RetirementProjectionComponent: React.FC = () => {
           </ResponsiveContainer>
         </ChartContainer>
       </div>
-      
       <div className="space-y-6">
         <div className="space-y-2">
           <div className="flex justify-between">
@@ -233,7 +232,6 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handleDepositChange}
           />
         </div>
-        
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Deposit Growth Rate (i_payIn): {i_payIn}%</label>
@@ -246,7 +244,6 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handlePayInRateChange}
           />
         </div>
-        
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Market Rate (r_MrktRate): {r_MrktRate}%</label>
@@ -259,7 +256,6 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handleMarketRateChange}
           />
         </div>
-        
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Payout Increase Rate (i_PayoutIncrease): {i_PayoutIncrease}%</label>
@@ -272,7 +268,6 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handlePayoutIncreaseChange}
           />
         </div>
-        
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Retirement Start Year (R_RentPayoutStart): {R_RentPayoutStart}</label>
@@ -285,7 +280,6 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handleRetirementStartChange}
           />
         </div>
-        
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Retirement Duration (N_RentDuration): {N_RentDuration} years</label>
