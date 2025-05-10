@@ -65,15 +65,23 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
               Adjust your monthly budget targets based on AI recommendations.
             </p>
             <div className="space-y-2">
-              {data.categories.slice(0, 3).map((category, index) => (
-                <div key={index} className="bg-white p-2 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium text-sm">{category.category}</h4>
-                    <p className="text-xs font-medium">€{Math.round(category.totalAmount * 0.9)}</p>
-                  </div>
-                  <p className="text-[10px] text-gray-500">-10% from €{category.totalAmount.toFixed(0)}</p>
+              {/* Netflix Card */}
+              <div className="bg-white p-2 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-medium text-sm">Netflix Standard Plan</h4>
+                  <p className="text-xs font-medium">€12.99</p>
                 </div>
-              ))}
+                <p className="text-[10px] text-gray-500">-10% from €14.99</p>
+              </div>
+              
+              {/* Amazon Prime Card */}
+              <div className="bg-white p-2 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-medium text-sm">Amazon Prime Subscription</h4>
+                  <p className="text-xs font-medium">€7.99</p>
+                </div>
+                <p className="text-[10px] text-gray-500">-10% from €8.99</p>
+              </div>
             </div>
           </div>
         </DialogContent>
