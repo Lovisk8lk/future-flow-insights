@@ -220,7 +220,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
               </div>
               
               {/* Cancel Button */}
-              <Button onClick={handleCancel} disabled={!selectedSubscription || !authorized || isCancelling} className="w-full mt-4 bg-black hover:bg-gray-800">
+              <Button onClick={handleCancel} disabled={!selectedSubscription || !authorized || isCancelling} className="w-full mt-4 bg-black hover:bg-gray-800 my-0">
                 {isCancelling ? "Cancelling..." : "Cancel Subscription"}
               </Button>
             </div>
