@@ -12,7 +12,7 @@ const MainScreen: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-white">
       <header className="p-5">
         <h1 className="text-3xl font-bold">
-          {activeTab === "retirement" ? "Analytics" : "Expense Analysis"}
+          Analytics
         </h1>
         <TabNavigation />
       </header>
