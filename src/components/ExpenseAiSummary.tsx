@@ -196,7 +196,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-finance-gray border-none max-w-[350px] p-3">
-          <DialogHeader className="pb-1">
+          <DialogHeader className="pb-0">
             <DialogTitle className="text-xl">Refine Your Budget</DialogTitle>
           </DialogHeader>
           <div className="py-0">
