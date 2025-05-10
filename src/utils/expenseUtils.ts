@@ -23,7 +23,6 @@ export const fetchExpensesByUserId = async (userId: string) => {
     return [];
   }
 
-  console.log(data);
   return data as ExpenseTransaction[];
 };
 
@@ -80,4 +79,76 @@ export const fetchAvailableMonths = async (userId: string) => {
   });
 
   return months;
+};
+
+// Group expenses by MCC and calculate sums
+export const groupExpensesByMCC = (transactions: ExpenseTransaction[]) => {
+  const groups: Record<string, { mcc: string, totalAmount: number }> = {};
+  
+  transactions.forEach(transaction => {
+    if (!transaction.mcc) return;
+    
+    const mcc = transaction.mcc;
+    
+    if (!groups[mcc]) {
+      groups[mcc] = {
+        mcc,
+        totalAmount: 0
+      };
+    }
+    
+    groups[mcc].totalAmount += Math.abs(transaction.amount || 0);
+  });
+  
+  return Object.values(groups).sort((a, b) => b.totalAmount - a.totalAmount);
+};
+
+// Group expenses by month and calculate sums
+export const groupExpensesByMonth = (transactions: ExpenseTransaction[]) => {
+  const groups: Record<string, { month: string, totalAmount: number }> = {};
+  
+  transactions.forEach(transaction => {
+    if (!transaction.bookingDate) return;
+    
+    const date = new Date(transaction.bookingDate);
+    const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+    const monthDisplay = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    
+    if (!groups[monthKey]) {
+      groups[monthKey] = {
+        month: monthDisplay,
+        totalAmount: 0
+      };
+    }
+    
+    groups[monthKey].totalAmount += Math.abs(transaction.amount || 0);
+  });
+  
+  // Sort by date (most recent first)
+  return Object.values(groups).sort((a, b) => {
+    const dateA = new Date(a.month);
+    const dateB = new Date(b.month);
+    return dateB.getTime() - dateA.getTime();
+  });
+};
+
+// Get MCC category name
+export const getMCCCategory = (mcc: string): string => {
+  // This is a simplified mapping - in a real app you would have a more comprehensive list
+  const mccMap: Record<string, string> = {
+    '5411': 'Grocery Stores',
+    '5812': 'Restaurants',
+    '5814': 'Fast Food',
+    '4121': 'Taxi/Rideshare',
+    '5541': 'Gas Stations',
+    '5499': 'Food & Beverage',
+    '5311': 'Department Stores',
+    '5912': 'Pharmacies',
+    '4112': 'Public Transportation',
+    '7832': 'Entertainment',
+    '7011': 'Hotels/Lodging',
+    // Add more MCC codes as needed
+  };
+  
+  return mccMap[mcc] || `Category ${mcc}`;
 };
