@@ -57,34 +57,34 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-finance-gray border-none max-w-[350px] min-h-[320px] p-4">
-          <DialogHeader className="pb-2">
-            <DialogTitle>Refine Your Budget</DialogTitle>
+        <DialogContent className="bg-finance-gray border-none max-w-[350px] min-h-[300px] p-3">
+          <DialogHeader className="pb-1">
+            <DialogTitle className="text-xl">Refine Your Budget</DialogTitle>
           </DialogHeader>
-          <div className="py-1">
-            <p className="text-xs text-gray-700 mb-2">
+          <div className="py-0">
+            <p className="text-sm text-gray-700 mb-2">
               Adjust your monthly budget targets based on AI recommendations.
             </p>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {/* Netflix Card */}
               <Link to="/subscription/netflix" className="block">
-                <div className="bg-white p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                <div className="bg-white p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                   <div className="flex justify-between items-center">
-                    <h4 className="font-medium text-sm">Netflix Standard Plan</h4>
-                    <p className="text-xs font-medium">€12.99</p>
+                    <h4 className="font-medium text-base">Netflix Standard Plan</h4>
+                    <p className="text-sm font-medium">€12.99</p>
                   </div>
-                  <p className="text-[10px] text-gray-500">-10% from €14.99</p>
+                  <p className="text-xs text-gray-500">-10% from €14.99</p>
                 </div>
               </Link>
               
               {/* Amazon Prime Card */}
               <Link to="/subscription/amazon-prime" className="block">
-                <div className="bg-white p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                <div className="bg-white p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                   <div className="flex justify-between items-center">
-                    <h4 className="font-medium text-sm">Amazon Prime Subscription</h4>
-                    <p className="text-xs font-medium">€7.99</p>
+                    <h4 className="font-medium text-base">Amazon Prime Subscription</h4>
+                    <p className="text-sm font-medium">€7.99</p>
                   </div>
-                  <p className="text-[10px] text-gray-500">-10% from €8.99</p>
+                  <p className="text-xs text-gray-500">-10% from €8.99</p>
                 </div>
               </Link>
             </div>
