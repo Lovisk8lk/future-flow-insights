@@ -15,7 +15,7 @@ export const fetchExpensesByUserId = async (userId: string) => {
   const { data, error } = await supabase
     .from('banking_sample_data')
     .select('*')
-    .eq('userId', userId)
+    // .eq('userId', userId)
 
   if (error) {
     console.error("Error fetching expenses:", error);
