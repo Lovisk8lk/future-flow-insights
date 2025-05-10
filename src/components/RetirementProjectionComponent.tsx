@@ -291,11 +291,14 @@ const RetirementProjectionComponent: React.FC = () => {
     };
   }, [roundedMax]);
 
-  // Create X-axis ticks for decades only (2030, 2040, etc.)
-  const startYear = currentYear;
-  const xAxisTicks = Array.from({ length: 5}, (_, i) => 
-    startYear + i * 10 - ((startYear + i * 10) % 10)
-  );
+  const startYear      = currentYear;
+  const firstDecade    = startYear - (startYear % 10);   // e.g. 2020
+  const lastDecade     = 2080;                           // ← change this if you ever want a different cap
+  
+  const xAxisTicks = Array.from(
+    { length: Math.floor((lastDecade - firstDecade) / 10) + 1 },
+    (_, i) => firstDecade + i * 10
+  );   // ➜ [2020, 2030, 2040, 2050, 2060, 2070, 2080]
 
   // Custom formatter for the Y-axis values
   const formatYAxis = (value: number) => {
