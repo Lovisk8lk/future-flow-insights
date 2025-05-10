@@ -214,11 +214,10 @@ const RetirementProjectionComponent: React.FC = () => {
       previousMaxRef.current = roundedMax;
       setYAxisAnimatedMax(roundedMax);
       setYAxisTicks([
-        Math.round(extendedMax / 4),
-        Math.round(extendedMax / 2),
-        Math.round(extendedMax * 3 / 4),
-        Math.round(roundedMax),
-        Math.round(extendedMax)               // top tick = new axis top
+        Math.round(roundedMax / 4),
+        Math.round(roundedMax / 2),
+        Math.round(roundedMax * 3 / 4),
+        Math.round(roundedMax)               // top tick = new axis top
       ]);
       return;
     }
@@ -263,7 +262,7 @@ const RetirementProjectionComponent: React.FC = () => {
             Math.round(currentMax / 4),
             Math.round(currentMax / 2),
             Math.round(currentMax * 3 / 4),
-            Math.round(currentMax)
+            Math.round(currentMax * 1.1)
           ]);
           
           if (progress < 1) {
