@@ -28,6 +28,7 @@ type Subscription = {
   name: string;
   price: string;
   id: string;
+  savings: string;
 };
 const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
   data,
