@@ -152,9 +152,7 @@ const RetirementProjectionComponent: React.FC = () => {
   };
 
   // Prepare data for chart
-  const yearsToProject = lastYearToDisplay - currentYear + 1;
-
-  const chartData = Array.from({ length: yearsToProject }, (_, i) => {
+  const chartData = Array(yearsToProject).fill(0).map((_, i) => {
     const year = currentYear + i;
     const x = i;
     
@@ -293,18 +291,14 @@ const RetirementProjectionComponent: React.FC = () => {
     };
   }, [roundedMax]);
 
-  /* ────────────────────────────── 1. constants ────────────────────────────── */
-  const currentYear        = 2025;
-  const lastYearToDisplay  = 2080;                 // hard cap for chart & axis
+  const startYear      = currentYear;
+  const firstDecade    = startYear - (startYear % 10);   // e.g. 2020
+  const lastDecade     = 2080;                           // ← change this if you ever want a different cap
   
-  /* ────────────────────────────── 2. X-axis ticks ─────────────────────────── */
-  // first complete decade (2025 → 2020, 2031 → 2030, …)
-  const firstDecade = currentYear - (currentYear % 10);
-  const xAxisTicks  = Array.from(
-    { length: Math.floor((lastYearToDisplay - firstDecade) / 10) + 1 },
+  const xAxisTicks = Array.from(
+    { length: Math.floor((lastDecade - firstDecade) / 10) + 1 },
     (_, i) => firstDecade + i * 10
-  );
-
+  );   // ➜ [2020, 2030, 2040, 2050, 2060, 2070, 2080]
 
   // Custom formatter for the Y-axis values
   const formatYAxis = (value: number) => {
@@ -343,12 +337,10 @@ const RetirementProjectionComponent: React.FC = () => {
                   stroke="#f0f0f0"
                   strokeDasharray="3 3" 
                 />
-                <XAxis
-                  dataKey="year"
-                  type="number"                                // needed so ‘domain’ is honoured
-                  domain={[currentYear, lastYearToDisplay]}    // ⇢ compresses scale to 2080
-                  ticks={xAxisTicks}
+                <XAxis 
+                  dataKey="year" 
                   tick={{ fontSize: 10 }}
+                  ticks={xAxisTicks}
                   tickLine={false}
                   axisLine={false}
                 />
