@@ -205,7 +205,7 @@ const RetirementProjectionComponent: React.FC = () => {
   const values = chartData.flatMap(d => [d.f, d.g, d.h]);
   const maxValue = Math.max(...values.filter(v => !isNaN(v) && isFinite(v)));
   const roundedMax = Math.ceil(maxValue / 1000) * 1000;
-  const extendedMax = roundedMax * 1.06;    // 10 % over the real max
+  const extendedMax = roundedMax * 1.1;    // 10 % over the real max
   
   // Y-axis animation logic with delay
   useEffect(() => {
@@ -351,7 +351,7 @@ const RetirementProjectionComponent: React.FC = () => {
                   axisLine={false}
                   orientation="right"
                   /** ⬇️  old: domain={[0, yAxisAnimatedMax || roundedMax]} */
-                  domain={[0, (yAxisAnimatedMax || roundedMax) * 1.06]}
+                  domain={[0, (yAxisAnimatedMax || roundedMax) * 1.1]}
                   allowDataOverflow
                 />
                 <Tooltip content={<ChartTooltipContent />} />

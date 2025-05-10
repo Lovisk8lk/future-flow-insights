@@ -203,7 +203,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
             </p>
             <div className="space-y-1 py-0">
               {/* Subscription Cards */}
-              {subscriptions.map(subscription => <div key={subscription.id} className={`bg-white p-6 rounded-lg cursor-pointer transition-colors ${selectedSubscription === subscription.id ? 'ring-2 ring-black' : 'hover:bg-gray-50'}`} onClick={() => handleSubscriptionSelect(subscription.id)}>
+              {subscriptions.map(subscription => <div key={subscription.id} className={`bg-white p-3 rounded-lg cursor-pointer transition-colors ${selectedSubscription === subscription.id ? 'ring-2 ring-black' : 'hover:bg-gray-50'}`} onClick={() => handleSubscriptionSelect(subscription.id)}>
                   <div className="flex justify-between items-center">
                     <h4 className="font-medium text-base">{subscription.name}</h4>
                     <p className="text-sm font-medium">{subscription.price}</p>
