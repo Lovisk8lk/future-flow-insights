@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
   Dialog, 
@@ -27,6 +27,49 @@ interface ExpenseAiSummaryProps {
 
 const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const fetchAiSummary = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Make a request to our Supabase Edge Function
+        const response = await fetch('/.netlify/functions/generate-ai-summary', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({}),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch AI summary');
+        }
+        
+        const result = await response.json();
+        setAiSummary(result.generatedText);
+      } catch (err) {
+        console.error('Error fetching AI summary:', err);
+        setError('Failed to load AI insights. Using fallback text.');
+        // Fallback to the static text
+        setAiSummary(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAiSummary();
+  }, [data.monthKey]); // Re-fetch when month changes
+  
+  // Fallback text to use when AI generation fails
+  const fallbackText = `Excellent expense management! Your spending this month shows consistent discipline in major categories.
+    ${previousMonth && data.totalAmount < previousMonth.totalAmount ? 
+      " You've reduced your overall expenses compared to last month, showing good financial discipline." : ""}
+    ${data.categories.length > 0 ? 
+      ` Your biggest expense category is ${data.categories[0].category}, representing ${(data.categories[0].totalAmount / data.totalAmount * 100).toFixed(0)}% of your total spending.` : ""}`;
   
   return (
     <>
@@ -40,13 +83,13 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
           <h3 className="text-lg font-semibold">Expense Intelligence</h3>
         </div>
         <CardContent className="p-4">
-          <p className="text-sm font-medium mb-4">
-            Excellent expense management! Your spending this month shows consistent discipline in major categories.
-            {previousMonth && data.totalAmount < previousMonth.totalAmount && 
-              " You've reduced your overall expenses compared to last month, showing good financial discipline."}
-            {data.categories.length > 0 && 
-              ` Your biggest expense category is ${data.categories[0].category}, representing ${(data.categories[0].totalAmount / data.totalAmount * 100).toFixed(0)}% of your total spending.`}
-          </p>
+          {isLoading ? (
+            <p className="text-sm font-medium mb-4">Loading AI insights...</p>
+          ) : (
+            <p className="text-sm font-medium mb-4">
+              {aiSummary || fallbackText}
+            </p>
+          )}
           <button 
             onClick={() => setIsDialogOpen(true)}
             className="w-full bg-black text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 transition-colors"
