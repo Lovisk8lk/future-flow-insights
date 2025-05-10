@@ -159,7 +159,7 @@ const RetirementProjectionComponent: React.FC = () => {
             width: "110%",
             margin: "0 auto",
             overflowX: "hidden",
-            overflowY: "visible"
+            overflowY: "visibles"
           }}
         >
           <ChartContainer config={chartConfig} className="h-full">
