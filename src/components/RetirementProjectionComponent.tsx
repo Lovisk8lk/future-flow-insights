@@ -16,7 +16,7 @@ const RetirementProjectionComponent: React.FC = () => {
     marketRate: r_MrktRate,
     retirementStartYear: R_RentPayoutStart,
     retirementGrowthRate: i_PayoutIncrease,
-    retirementDuration: N_RentDuration = 30 // Default value if not already in context
+    retirementDuration: N_RentDuration = 20 // Default value if not already in context
   } = retirementData;
   
   // Add animation state for Y-axis
@@ -34,7 +34,7 @@ const RetirementProjectionComponent: React.FC = () => {
   useEffect(() => {
     // Ensure retirementDuration is set if it doesn't exist
     if (retirementData.retirementDuration === undefined) {
-      updateRetirementData({ retirementDuration: 30 });
+      updateRetirementData({ retirementDuration: 20 });
     }
   }, [retirementData, updateRetirementData]);
 
@@ -43,25 +43,9 @@ const RetirementProjectionComponent: React.FC = () => {
     updateRetirementData({ monthlyDeposit: value[0] });
   };
 
-  const handlePayInRateChange = (value: number[]) => {
-    updateRetirementData({ depositGrowthRate: value[0] });
-  };
-
-  const handleMarketRateChange = (value: number[]) => {
-    updateRetirementData({ marketRate: value[0] });
-  };
-
-  const handlePayoutIncreaseChange = (value: number[]) => {
-    updateRetirementData({ retirementGrowthRate: value[0] });
-  };
-
   const handleRetirementStartChange = (value: number[]) => {
     const currentYear = 2025;
     updateRetirementData({ retirementStartYear: currentYear + value[0] });
-  };
-
-  const handleRetirementDurationChange = (value: number[]) => {
-    updateRetirementData({ retirementDuration: value[0] });
   };
 
   // Calculate the projection data based on the formulas
@@ -378,7 +362,7 @@ const RetirementProjectionComponent: React.FC = () => {
       <div className="space-y-6">
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Monthly Deposit (P_Deposit): €{P_Deposit}</label>
+            <label className="text-sm font-medium">Monthly Deposit: €{P_Deposit}</label>
           </div>
           <Slider 
             defaultValue={[P_Deposit]} 
@@ -391,20 +375,7 @@ const RetirementProjectionComponent: React.FC = () => {
         
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Deposit Growth Rate (i_payIn): {i_payIn}%</label>
-          </div>
-          <Slider 
-            defaultValue={[i_payIn]} 
-            max={10}
-            min={0}
-            step={0.1}
-            onValueChange={handlePayInRateChange}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <label className="text-sm font-medium">Retirement Start Year (R_RentPayoutStart): {R_RentPayoutStart}</label>
+            <label className="text-sm font-medium">Retirement Start Year: {R_RentPayoutStart}</label>
           </div>
           <Slider 
             defaultValue={[R_RentPayoutStart - currentYear]} 
@@ -412,45 +383,6 @@ const RetirementProjectionComponent: React.FC = () => {
             min={5}
             step={1}
             onValueChange={handleRetirementStartChange}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <label className="text-sm font-medium">Market Rate (r_MrktRate): {r_MrktRate}%</label>
-          </div>
-          <Slider 
-            defaultValue={[r_MrktRate]} 
-            max={15}
-            min={1}
-            step={0.1}
-            onValueChange={handleMarketRateChange}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <label className="text-sm font-medium">Retirement Growth Rate (i_PayoutIncrease): {i_PayoutIncrease}%</label>
-          </div>
-          <Slider 
-            defaultValue={[i_PayoutIncrease]} 
-            max={10}
-            min={0}
-            step={0.1}
-            onValueChange={handlePayoutIncreaseChange}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <label className="text-sm font-medium">Retirement Duration (N_RentDuration): {N_RentDuration} years</label>
-          </div>
-          <Slider 
-            defaultValue={[N_RentDuration]} 
-            max={50}
-            min={10}
-            step={1}
-            onValueChange={handleRetirementDurationChange}
           />
         </div>
       </div>
