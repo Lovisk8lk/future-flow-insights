@@ -152,7 +152,7 @@ const RetirementProjectionComponent: React.FC = () => {
   return (
     <div className="flex flex-col px-5 py-4">
       <div className="h-64 mb-5">
-        <div style={{ maxWidth: "100%", width: "100%", margin: "0 auto", overflow: "hidden", maxLength: "200%", length: "200%" }}>
+        <div style={{ maxWidth: "100%", width: "100%", margin: "0 auto", overflow: "hidden"}}>
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
