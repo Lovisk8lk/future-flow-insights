@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft, TrendingUp } from "lucide-react";
 import { useFinance } from "../contexts/FinanceContext";
 import {
   Select,
@@ -49,38 +49,38 @@ const OnboardingFlow: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
   return (
     <div className="fixed inset-0 bg-white z-50 flex flex-col min-h-screen">
       {/* Progress indicator */}
-      <div className="w-full bg-gray-100 h-1 mb-6">
+      <div className="w-full bg-gray-100 h-1">
         <div
-          className="bg-blue-500 h-1 transition-all duration-300 ease-in-out"
+          className="bg-finance-green h-1 transition-all duration-300 ease-in-out"
           style={{ width: `${((step + 1) / 4) * 100}%` }}
         />
       </div>
 
-      <div className="flex-1 flex flex-col px-5 py-4">
+      <div className="flex-1 flex flex-col px-5 py-8">
         {step === 0 && (
           <div className="flex flex-col items-center justify-center flex-1 text-center">
+            <div className="w-16 h-16 bg-finance-gray rounded-full flex items-center justify-center mb-8">
+              <TrendingUp className="h-8 w-8 text-finance-green" />
+            </div>
             <h1 className="text-3xl font-bold mb-6">Welcome to your retirement planner</h1>
             <p className="text-gray-600 mb-12 max-w-md">
-              This tool helps you plan your financial future by forecasting your retirement savings.
+              Plan your financial future by forecasting your retirement savings.
             </p>
-            <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mb-8">
-              <span className="text-white text-3xl">💰</span>
-            </div>
           </div>
         )}
 
         {step === 1 && (
           <div className="flex flex-col items-center justify-center flex-1">
-            <h1 className="text-2xl font-bold mb-4">How much can you invest per month?</h1>
+            <h1 className="text-2xl font-bold mb-4">Monthly contribution</h1>
             <p className="text-gray-600 mb-8 text-center">
-              Regular investment is key to building your retirement fund.
+              How much can you invest per month?
             </p>
             <div className="w-full max-w-xs mb-8 relative">
               <Input
                 type="number"
                 value={monthlyDeposit}
                 onChange={(e) => setMonthlyDeposit(e.target.value)}
-                className="pr-8 text-xl h-14 text-center font-medium"
+                className="pr-8 text-xl h-14 text-center font-medium border-finance-gray"
                 min="0"
               />
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -92,9 +92,9 @@ const OnboardingFlow: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
 
         {step === 2 && (
           <div className="flex flex-col items-center justify-center flex-1">
-            <h1 className="text-2xl font-bold mb-4">When do you plan to retire?</h1>
+            <h1 className="text-2xl font-bold mb-4">Target retirement year</h1>
             <p className="text-gray-600 mb-8 text-center">
-              This helps us calculate how long your money has to grow.
+              When do you plan to retire?
             </p>
             <div className="w-full max-w-xs mb-8">
               <Select
@@ -118,16 +118,16 @@ const OnboardingFlow: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
 
         {step === 3 && (
           <div className="flex flex-col items-center justify-center flex-1">
-            <h1 className="text-2xl font-bold mb-4">How much have you already saved?</h1>
+            <h1 className="text-2xl font-bold mb-4">Starting capital</h1>
             <p className="text-gray-600 mb-8 text-center">
-              If you already have retirement savings, we'll add it to your projection.
+              How much have you already saved for retirement?
             </p>
             <div className="w-full max-w-xs mb-8 relative">
               <Input
                 type="number"
                 value={initialCapital}
                 onChange={(e) => setInitialCapital(e.target.value)}
-                className="pr-8 text-xl h-14 text-center font-medium"
+                className="pr-8 text-xl h-14 text-center font-medium border-finance-gray"
                 min="0"
               />
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -138,12 +138,12 @@ const OnboardingFlow: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
         )}
 
         {/* Navigation buttons */}
-        <div className="flex justify-between py-4">
+        <div className="flex justify-between pt-4 mt-auto">
           {step > 0 ? (
             <Button
               variant="outline"
               onClick={handleBack}
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 border-finance-gray text-black"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
@@ -151,7 +151,10 @@ const OnboardingFlow: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
           ) : (
             <div></div>
           )}
-          <Button onClick={handleNext} className="flex items-center gap-1">
+          <Button 
+            onClick={handleNext} 
+            className="flex items-center gap-1 bg-finance-green hover:bg-finance-green/90 text-white"
+          >
             {step === 3 ? "Complete" : "Next"}
             <ArrowRight className="h-4 w-4" />
           </Button>
