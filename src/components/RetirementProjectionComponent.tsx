@@ -454,7 +454,7 @@ const RetirementProjectionComponent: React.FC = () => {
         </div>
       </Card>
       
-      <div className="space-y-6">
+      <div className="flex flex-wrap gap-6">
         {/* Monthly Deposit Input Field */}
         <div className="space-y-2">
           <div className="flex justify-between">
