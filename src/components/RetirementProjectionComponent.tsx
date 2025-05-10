@@ -7,6 +7,13 @@ import { ChartContainer, ChartTooltipContent } from "./ui/chart";
 import { Card } from "./ui/card";
 import { Separator } from "./ui/separator";
 import { Link } from "react-router-dom";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "./ui/select";
 
 const RetirementProjectionComponent: React.FC = () => {
   const { retirementData, updateRetirementData, expenses, setActiveTab } = useFinance();
@@ -31,6 +38,9 @@ const RetirementProjectionComponent: React.FC = () => {
   const animationStartTimeRef = useRef<number | null>(null);
   const delayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Create local state for the input field to handle changes
+  const [depositInputValue, setDepositInputValue] = useState(P_Deposit.toString());
+  
   useEffect(() => {
     // Ensure retirementDuration is set if it doesn't exist
     if (retirementData.retirementDuration === undefined) {
@@ -38,20 +48,46 @@ const RetirementProjectionComponent: React.FC = () => {
     }
   }, [retirementData, updateRetirementData]);
 
-  // Handle slider changes
-  const handleDepositChange = (value: number[]) => {
-    updateRetirementData({ monthlyDeposit: value[0] });
+  // Update local state when the context value changes
+  useEffect(() => {
+    setDepositInputValue(P_Deposit.toString());
+  }, [P_Deposit]);
+
+  // Handle input change for monthly deposit
+  const handleDepositInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDepositInputValue(e.target.value);
   };
 
-  const handleRetirementStartChange = (value: number[]) => {
-    const currentYear = 2025;
-    updateRetirementData({ retirementStartYear: currentYear + value[0] });
+  // Handle blur for monthly deposit (commits the change to context)
+  const handleDepositBlur = () => {
+    const value = parseInt(depositInputValue, 10);
+    if (!isNaN(value) && value >= 0) {
+      updateRetirementData({ monthlyDeposit: value });
+    } else {
+      // Reset to last valid value if input is invalid
+      setDepositInputValue(P_Deposit.toString());
+    }
+  };
+
+  // Handle pressing Enter for monthly deposit
+  const handleDepositKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleDepositBlur();
+    }
+  };
+
+  // Handle retirement year selection
+  const handleRetirementYearChange = (value: string) => {
+    updateRetirementData({ retirementStartYear: parseInt(value, 10) });
   };
 
   // Calculate the projection data based on the formulas
   const currentYear = 2025;
-  const yearsToProject = 60; // Project 60 years into the future to cover longer retirement periods
+  const yearsToProject = 70; // Project 70 years into the future to cover longer retirement periods
 
+  // Generate years for the dropdown
+  const retirementYearOptions = Array.from({ length: 71 }, (_, i) => currentYear + i + 1);
+  
   // Prepare data for chart
   const rentStartIndex = R_RentPayoutStart - currentYear;
   let g_at_retirement = 0;
@@ -270,7 +306,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
   return (
     <div className="flex flex-col px-5 py-4">
-      {/* Updated message card moved below pension and above sliders */}
+      {/* Message card placed between pension and sliders */}
       <Card className="mb-6 py-2 px-3 bg-gradient-to-r from-gray-50 to-white border-gray-100">
         <div className="flex items-center text-xs font-medium text-gray-800">
           <span className="mr-1">💡</span>
@@ -392,30 +428,45 @@ const RetirementProjectionComponent: React.FC = () => {
       </Card>
       
       <div className="space-y-6">
+        {/* Monthly Deposit Input Field */}
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Monthly Deposit: €{P_Deposit}</label>
+            <label className="text-sm font-medium">Monthly Deposit</label>
           </div>
-          <Slider 
-            defaultValue={[P_Deposit]} 
-            max={2000}
-            min={0}
-            step={10}
-            onValueChange={handleDepositChange}
-          />
+          <div className="relative">
+            <Input
+              type="number"
+              value={depositInputValue}
+              onChange={handleDepositInputChange}
+              onBlur={handleDepositBlur}
+              onKeyDown={handleDepositKeyDown}
+              min="0"
+              className="pr-8"
+            />
+            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+          </div>
         </div>
         
+        {/* Retirement Year Select */}
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Retirement Start Year: {R_RentPayoutStart}</label>
+            <label className="text-sm font-medium">Retirement Start Year</label>
           </div>
-          <Slider 
-            defaultValue={[R_RentPayoutStart - currentYear]} 
-            max={100}
-            min={5}
-            step={1}
-            onValueChange={handleRetirementStartChange}
-          />
+          <Select 
+            value={R_RentPayoutStart.toString()} 
+            onValueChange={handleRetirementYearChange}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select year" />
+            </SelectTrigger>
+            <SelectContent>
+              {retirementYearOptions.map(year => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>
