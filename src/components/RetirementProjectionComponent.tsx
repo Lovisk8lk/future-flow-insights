@@ -290,7 +290,7 @@ const RetirementProjectionComponent: React.FC = () => {
           </div>
           <Slider 
             defaultValue={[R_RentPayoutStart - currentYear]} 
-            max={40}
+            max={100}
             min={5}
             step={1}
             onValueChange={handleRetirementStartChange}
