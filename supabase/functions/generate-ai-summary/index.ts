@@ -30,6 +30,7 @@ A single, concise, upbeat in-app message that:
 	2.	Drives action by naming one specific low-value or duplicative subscription to cancel and hinting at its long-term benefit.
 	3.	Clearly points out when the user subscribes to multiple services in the same category and suggests streamlining to reduce unnecessary spend.
 	4.	Optionally recommends alternatives—other services the user already uses or cost-effective non-digital tools relevant to their city (e.g., transport passes).
+    5.  Always mention only one recommendation at most.
 
 Tone: Friendly, empowering, action-oriented, and urgent—celebrate progress and spotlight opportunity.
 
