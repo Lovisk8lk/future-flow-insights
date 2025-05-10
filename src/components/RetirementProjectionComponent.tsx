@@ -137,9 +137,9 @@ const RetirementProjectionComponent: React.FC = () => {
   // Custom formatter for the Y-axis values
   const formatYAxis = (value: number) => {
     if (value >= 1000000) {
-      return ${(value / 1000000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M;
+      return `${(value / 1000000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`;
     }
-    return ${(value / 1000).toLocaleString()}k;
+    return `${(value / 1000).toLocaleString()}k`;
   };
 
   // Chart configuration for the colors
@@ -151,7 +151,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
   return (
     <div className="flex flex-col px-5 py-4">
-      <div className="h-64 mb-6">
+      <div className="h-96 mb-6">
         <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
@@ -200,7 +200,7 @@ const RetirementProjectionComponent: React.FC = () => {
                 type="monotone" 
                 dataKey="h" 
                 stroke="#727272" 
-                strokeWidth={3.5}
+                strokeWidth={3}
                 dot={false} 
                 activeDot={{ r: 6, fill: "#727272", stroke: "#fff" }} 
                 name="h"
@@ -219,6 +219,7 @@ const RetirementProjectionComponent: React.FC = () => {
           </ResponsiveContainer>
         </ChartContainer>
       </div>
+      
       <div className="space-y-6">
         <div className="space-y-2">
           <div className="flex justify-between">
@@ -232,6 +233,7 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handleDepositChange}
           />
         </div>
+        
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Deposit Growth Rate (i_payIn): {i_payIn}%</label>
@@ -244,6 +246,7 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handlePayInRateChange}
           />
         </div>
+        
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Market Rate (r_MrktRate): {r_MrktRate}%</label>
@@ -256,6 +259,7 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handleMarketRateChange}
           />
         </div>
+        
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Payout Increase Rate (i_PayoutIncrease): {i_PayoutIncrease}%</label>
@@ -268,6 +272,7 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handlePayoutIncreaseChange}
           />
         </div>
+        
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Retirement Start Year (R_RentPayoutStart): {R_RentPayoutStart}</label>
@@ -280,6 +285,7 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handleRetirementStartChange}
           />
         </div>
+        
         <div className="space-y-2">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Retirement Duration (N_RentDuration): {N_RentDuration} years</label>
