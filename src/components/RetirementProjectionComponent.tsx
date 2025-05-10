@@ -151,7 +151,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
   return (
     <div className="flex flex-col px-5 py-4">
-      <div className="h-110 mb-5">
+      <div className="h-[600] mb-5">
         <div                       // 👈 make this fill its parent
           style={{
             height: "100%",        //  ✨ add this line
