@@ -172,7 +172,7 @@ const RetirementProjectionComponent: React.FC = () => {
     <div className="flex flex-col px-5 py-4">
       <div style={{ height: "600px", marginBottom: "0" }}>
         <ChartContainer config={chartConfig} style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
-          <ResponsiveContainer width="50%" height="100%">
+          <ResponsiveContainer width="10%" height="100%">
             <LineChart data={chartData} margin={{ top: 10, right: 30, left: 5, bottom: 10 }}>
               <CartesianGrid horizontal vertical={false} stroke="#f0f0f0" strokeDasharray="3 3" />
               <XAxis dataKey="year" tick={{ fontSize: 10 }} ticks={xAxisTicks} tickLine={false} axisLine={false} />
