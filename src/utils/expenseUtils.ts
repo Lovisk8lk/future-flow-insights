@@ -72,7 +72,8 @@ export const fetchAvailableMonths = async (userId: string) => {
         months.push({
           year,
           month,
-          label: new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+          label: new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+          value: `${year}-${String(month + 1).padStart(2, '0')}`
         });
       }
     }
@@ -132,44 +133,64 @@ export const groupExpensesByMonth = (transactions: ExpenseTransaction[]) => {
   });
 };
 
-// Get MCC category name - Updated with correct mapping
+// Get consolidated MCC category name - Updated with broader categories
 export const getMCCCategory = (mcc: string): string => {
-  const mccMap: Record<string, string> = {
-    '8043': 'Optometrists, Ophthalmologists',
-    '5411': 'Grocery Stores / Supermarkets',
-    '5651': 'Family Clothing Stores',
-    '5661': 'Shoe Stores',
-    '5912': 'Pharmacies',
-    '5812': 'Restaurants',
-    '4722': 'Travel Agencies and Tour Operators',
-    '7991': 'Tourist Attractions and Exhibits',
-    '5941': 'Sporting Goods Stores',
-    '5311': 'Department Stores',
-    '5462': 'Bakeries',
-    '5921': 'Package Stores (Alcoholic Beverages)',
-    '9399': 'Government Services (Miscellaneous)',
-    '5499': 'Misc. Food Stores (Specialty, etc.)',
-    '4814': 'Telecommunication Services',
-    '5712': 'Furniture, Home Furnishings Stores',
-    '7011': 'Hotels, Motels, Resorts',
-    '4789': 'Transportation Services (Misc.)',
-    '5970': 'Artist Supply / Craft Stores',
-    '5814': 'Fast Food Restaurants',
-    '5541': 'Gas Stations (with or without fuel)',
-    '4215': 'Courier Services, Air or Ground',
-    '5942': 'Book Stores',
-    '7523': 'Parking Lots, Garages',
+  // Mapping MCCs to broader category groups
+  const mccCategoryMap: Record<string, string> = {
+    // Clothing & Apparel
+    '5651': 'Clothing & Apparel',
+    '5661': 'Clothing & Apparel',
+    
+    // Food & Grocery
+    '5411': 'Food & Grocery',
+    '5462': 'Food & Grocery',
+    '5499': 'Food & Grocery',
+    
+    // Dining & Restaurants
+    '5812': 'Dining & Restaurants',
+    '5814': 'Dining & Restaurants',
+    
+    // Health & Medical
+    '8043': 'Health & Medical',
+    '5912': 'Health & Medical',
+    
+    // Travel & Transportation
+    '4722': 'Travel & Transportation',
+    '7991': 'Travel & Transportation',
+    '7011': 'Travel & Transportation',
+    '4789': 'Travel & Transportation',
+    '7523': 'Travel & Transportation',
+    '4215': 'Travel & Transportation',
+    
+    // Shopping & Retail
+    '5941': 'Shopping & Retail',
+    '5311': 'Shopping & Retail',
+    '5970': 'Shopping & Retail',
+    '5712': 'Shopping & Retail',
+    '5942': 'Shopping & Retail',
+    
+    // Alcohol & Beverages
+    '5921': 'Alcohol & Beverages',
+    
+    // Government & Services
+    '9399': 'Government & Services',
+    
+    // Utilities & Telecom
+    '4814': 'Utilities & Telecom',
+    
+    // Automotive
+    '5541': 'Automotive'
   };
   
-  return mccMap[mcc] || `Category ${mcc}`;
+  return mccCategoryMap[mcc] || `Other`;
 };
 
-// New function: Group expenses by month and then by category
+// New function: Group expenses by month and then by consolidated category
 export const groupExpensesByMonthAndCategory = (transactions: ExpenseTransaction[]) => {
   type CategoryGroup = {
-    mcc: string;
-    categoryName: string;
+    category: string;
     totalAmount: number;
+    transactions: ExpenseTransaction[];
   };
 
   type MonthGroup = {
@@ -203,19 +224,20 @@ export const groupExpensesByMonthAndCategory = (transactions: ExpenseTransaction
     monthGroups[monthKey].totalAmount += Math.abs(transaction.amount || 0);
     
     // Find or create category in this month
-    let categoryGroup = monthGroups[monthKey].categories.find(c => c.mcc === transaction.mcc);
+    let categoryGroup = monthGroups[monthKey].categories.find(c => c.category === categoryName);
     
     if (!categoryGroup) {
       categoryGroup = {
-        mcc: transaction.mcc,
-        categoryName,
-        totalAmount: 0
+        category: categoryName,
+        totalAmount: 0,
+        transactions: []
       };
       monthGroups[monthKey].categories.push(categoryGroup);
     }
     
-    // Update category total
+    // Update category total and add transaction to category group
     categoryGroup.totalAmount += Math.abs(transaction.amount || 0);
+    categoryGroup.transactions.push(transaction);
   });
   
   // Sort categories within each month by total amount
