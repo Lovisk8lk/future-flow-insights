@@ -150,7 +150,7 @@ const RetirementProjectionComponent: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col px-5 py-10">
+    <div className="flex flex-col px-5 py-8">
       <div className="h-64 mb-6">
         <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
