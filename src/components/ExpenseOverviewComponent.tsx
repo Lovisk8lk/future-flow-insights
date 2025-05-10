@@ -155,7 +155,7 @@ const ExpenseOverviewComponent: React.FC = () => {
               return <div key={index} className={`flex items-center p-4 ${index !== filteredMonthData.categories.length - 1 ? "border-b" : ""}`}>
                         <div className="w-1/4 text-md">{category.category}</div>
                         <div className="w-1/2 px-4">
-                          <Progress value={category.totalAmount / filteredMonthData.totalAmount * 100} className="h-8 bg-gray-200" />
+                          <Progress value={category.totalAmount / filteredMonthData.totalAmount * 100} className="h-4 bg-gray-200" />
                         </div>
                         <div className="w-1/4 text-right">
                           <div className="text-md">{category.totalAmount.toFixed(0)} €</div>
