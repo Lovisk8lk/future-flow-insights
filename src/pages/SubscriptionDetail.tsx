@@ -15,7 +15,7 @@ const SubscriptionDetail: React.FC = () => {
 
   return (
     <div className="container max-w-md mx-auto p-4">
-      <Link to="/?tab=expenses">
+      <Link to="/?tab=expenses#expense-intelligence-card">
         <Button variant="ghost" className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back
         </Button>
