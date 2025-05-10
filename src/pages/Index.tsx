@@ -58,7 +58,7 @@ const IndexContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white max-w-md mx-auto shadow-lg overflow-hidden">
+    <div className="min-h-screen bg-white w-full max-w-md mx-auto shadow-lg">
       {!hasCompletedOnboarding ? (
         <OnboardingFlow onComplete={handleOnboardingComplete} />
       ) : (
