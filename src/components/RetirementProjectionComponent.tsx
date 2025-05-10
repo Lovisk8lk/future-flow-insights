@@ -343,8 +343,8 @@ const RetirementProjectionComponent: React.FC = () => {
                 />
                 <XAxis
                   dataKey="year"
-                  type="number"                                // needed so ‘domain’ is honoured
-                  domain={[currentYear, lastYearToDisplay]}    // ⇢ compresses scale to 2080
+                  type="number"                                 /* NEW */
+                  domain={[currentYear, lastYearToDisplay]}     /* NEW */
                   ticks={xAxisTicks}
                   tick={{ fontSize: 10 }}
                   tickLine={false}
