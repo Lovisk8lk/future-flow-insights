@@ -263,7 +263,7 @@ const RetirementProjectionComponent: React.FC = () => {
             Math.round(currentMax / 4),
             Math.round(currentMax / 2),
             Math.round(currentMax * 3 / 4),
-            Math.round(currentMax * 1.1)
+            Math.round(currentMax)
           ]);
           
           if (progress < 1) {
@@ -292,7 +292,7 @@ const RetirementProjectionComponent: React.FC = () => {
         clearTimeout(delayTimeoutRef.current);
       }
     };
-  }, [extendedMax]);
+  }, [roundedMax]);
 
   // Create X-axis ticks for decades only (2030, 2040, etc.)
   const startYear = currentYear;
