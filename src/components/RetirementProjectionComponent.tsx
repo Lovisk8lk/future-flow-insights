@@ -153,7 +153,7 @@ const RetirementProjectionComponent: React.FC = () => {
     <div className="h-64 mb-6">
       <div style={{ width: "500px", margin: "0 auto" }}>
         <ChartContainer config={chartConfig}>
-          <ResponsiveContainer width="100%" height={250}>
+          <ResponsiveContainer width="50%" height={250}>
             <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
               <CartesianGrid 
                 horizontal={true}
