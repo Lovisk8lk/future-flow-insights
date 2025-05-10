@@ -7,6 +7,7 @@ import {
   DialogHeader, 
   DialogTitle 
 } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
 
 type MonthCategorySummary = {
   month: string;
@@ -56,32 +57,36 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-finance-gray border-none max-w-[350px] min-h-[340px]">
-          <DialogHeader>
+        <DialogContent className="bg-finance-gray border-none max-w-[350px] min-h-[320px] p-4">
+          <DialogHeader className="pb-2">
             <DialogTitle>Refine Your Budget</DialogTitle>
           </DialogHeader>
-          <div className="py-3">
-            <p className="text-xs text-gray-700 mb-3">
+          <div className="py-1">
+            <p className="text-xs text-gray-700 mb-2">
               Adjust your monthly budget targets based on AI recommendations.
             </p>
             <div className="space-y-2">
               {/* Netflix Card */}
-              <div className="bg-white p-2 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-medium text-sm">Netflix Standard Plan</h4>
-                  <p className="text-xs font-medium">€12.99</p>
+              <Link to="/subscription/netflix" className="block">
+                <div className="bg-white p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-medium text-sm">Netflix Standard Plan</h4>
+                    <p className="text-xs font-medium">€12.99</p>
+                  </div>
+                  <p className="text-[10px] text-gray-500">-10% from €14.99</p>
                 </div>
-                <p className="text-[10px] text-gray-500">-10% from €14.99</p>
-              </div>
+              </Link>
               
               {/* Amazon Prime Card */}
-              <div className="bg-white p-2 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-medium text-sm">Amazon Prime Subscription</h4>
-                  <p className="text-xs font-medium">€7.99</p>
+              <Link to="/subscription/amazon-prime" className="block">
+                <div className="bg-white p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-medium text-sm">Amazon Prime Subscription</h4>
+                    <p className="text-xs font-medium">€7.99</p>
+                  </div>
+                  <p className="text-[10px] text-gray-500">-10% from €8.99</p>
                 </div>
-                <p className="text-[10px] text-gray-500">-10% from €8.99</p>
-              </div>
+              </Link>
             </div>
           </div>
         </DialogContent>
