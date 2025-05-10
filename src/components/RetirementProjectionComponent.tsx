@@ -254,16 +254,18 @@ const RetirementProjectionComponent: React.FC = () => {
           const progress = Math.min(elapsed / animationDuration, 1);
           const easedProgress = easeOutCubic(progress);
           
-          // Interpolate between start and target values
-          const currentMax = startValue + (targetValue - startValue) * easedProgress;
-          setYAxisAnimatedMax(currentMax);
           
-          // Update ticks with animated values
+          // inside animateYAxis()
+          const currentCoreMax = startValue + (targetValue - startValue) * easedProgress;
+          const extended = Math.round(currentCoreMax * 1.1);
+          
+          setYAxisAnimatedMax(currentCoreMax);
           setYAxisTicks([
-            Math.round(currentMax / 4),
-            Math.round(currentMax / 2),
-            Math.round(currentMax * 3 / 4),
-            Math.round(currentMax * 1.1)
+            Math.round(currentCoreMax / 4),
+            Math.round(currentCoreMax / 2),
+            Math.round(currentCoreMax * 3 / 4),
+            Math.round(currentCoreMax),              // labelled (animates)
+            extended                                 // unlabeled
           ]);
           
           if (progress < 1) {
@@ -347,11 +349,17 @@ const RetirementProjectionComponent: React.FC = () => {
                 <YAxis
                   tick={{ fontSize: 10 }}
                   ticks={yAxisTicks}
-                  tickFormatter={formatYAxis}
+                  /* 👇 hide label for the *very top* tick */
+                  tickFormatter={(v) => {
+                    // if this is the extendedMax tick: suppress label
+                    const top = Math.round((yAxisAnimatedMax || roundedMax) * 1.1);
+                    if (Math.abs(v - top) < 1) return "";
+                    // otherwise use your normal formatter
+                    return formatYAxis(v);
+                  }}
                   tickLine={false}
                   axisLine={false}
                   orientation="right"
-                  /** ⬇️  old: domain={[0, yAxisAnimatedMax || roundedMax]} */
                   domain={[0, (yAxisAnimatedMax || roundedMax) * 1.1]}
                   allowDataOverflow
                 />
