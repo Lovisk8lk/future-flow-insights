@@ -215,7 +215,7 @@ const RetirementProjectionComponent: React.FC = () => {
             Math.round(currentMax / 4),
             Math.round(currentMax / 2),
             Math.round(currentMax * 3 / 4),
-            Math.round(currentMax)
+            Math.round(currentMax * 1.1)
           ]);
           
           if (progress < 1) {
