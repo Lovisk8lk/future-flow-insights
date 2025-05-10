@@ -14,6 +14,16 @@ interface ExpenseCategory extends Expense {
   change: number;
 }
 
+interface RetirementDataType {
+  monthlyDeposit: number;
+  growthRate: number;
+  depositGrowthRate: number;
+  marketRate: number;
+  retirementYearlyAmount: number;
+  retirementGrowthRate: number;
+  retirementStartYear: number;
+}
+
 interface FinanceContextType {
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -30,6 +40,8 @@ interface FinanceContextType {
   setSelectedMonth: (month: string) => void;
   isLoading: boolean;
   error: string | null;
+  retirementData: RetirementDataType;
+  updateRetirementData: (data: Partial<RetirementDataType>) => void;
 }
 
 const defaultFinanceContext: FinanceContextType = {
@@ -48,6 +60,16 @@ const defaultFinanceContext: FinanceContextType = {
   setSelectedMonth: () => {},
   isLoading: false,
   error: null,
+  retirementData: {
+    monthlyDeposit: 1000,
+    growthRate: 3,
+    depositGrowthRate: 2,
+    marketRate: 5,
+    retirementYearlyAmount: 40000,
+    retirementGrowthRate: 2,
+    retirementStartYear: 2050
+  },
+  updateRetirementData: () => {}
 };
 
 const FinanceContext = createContext<FinanceContextType>(defaultFinanceContext);
@@ -78,6 +100,14 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [availableMonths, setAvailableMonths] = useState<string[]>([]);
+  const [retirementData, setRetirementData] = useState<RetirementDataType>(defaultFinanceContext.retirementData);
+
+  const updateRetirementData = (data: Partial<RetirementDataType>) => {
+    setRetirementData(prev => ({
+      ...prev,
+      ...data
+    }));
+  };
 
   // Fetch expense data from Supabase
   useEffect(() => {
@@ -111,12 +141,12 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         
         // Get current month data
         const currentMonthStart = `${selectedMonth}-01`;
-        const nextMonth = new Date(selectedMonth.slice(0, 4), parseInt(selectedMonth.slice(5, 7)), 1);
+        const nextMonth = new Date(parseInt(selectedMonth.slice(0, 4)), parseInt(selectedMonth.slice(5, 7)), 1);
         nextMonth.setMonth(nextMonth.getMonth() + 1);
         const currentMonthEnd = nextMonth.toISOString().slice(0, 10);
         
         // Get previous month data for comparison
-        const prevMonth = new Date(selectedMonth.slice(0, 4), parseInt(selectedMonth.slice(5, 7)) - 2, 1);
+        const prevMonth = new Date(parseInt(selectedMonth.slice(0, 4)), parseInt(selectedMonth.slice(5, 7)) - 2, 1);
         const prevMonthStart = prevMonth.toISOString().slice(0, 10);
         const prevMonthEnd = `${selectedMonth}-01`;
 
@@ -245,7 +275,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         expenses,
         setSelectedMonth,
         isLoading,
-        error
+        error,
+        retirementData,
+        updateRetirementData
       }}
     >
       {children}
