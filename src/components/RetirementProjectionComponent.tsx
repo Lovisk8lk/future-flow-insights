@@ -149,181 +149,157 @@ const RetirementProjectionComponent: React.FC = () => {
     h: { color: "#727272", label: "Function h(x)" },
   };
 
-  <div className="flex flex-col px-5 py-4">
-    {/* ─────────────────── Chart ─────────────────── */}
-    <div className="mb-8">
+  return (
+    <div className="mb-8">               {/* no fixed height needed here */}
       <ChartContainer config={chartConfig}>
-        {/* give Recharts a real height → 420 px */}
-        <ResponsiveContainer width="100%" height={420}>
-          <LineChart
-            data={chartData}
-            margin={{ top: 5, right: 30, left: 5, bottom: 5 }}
-          >
-            <CartesianGrid
-              horizontal
-              vertical={false}
-              stroke="#f0f0f0"
-              strokeDasharray="3 3"
-            />
-            <XAxis
-              dataKey="year"
-              tick={{ fontSize: 10 }}
-              ticks={xAxisTicks}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 10 }}
-              ticks={yAxisTicks}
-              tickFormatter={formatYAxis}
-              tickLine={false}
-              axisLine={false}
-              orientation="right"
-              domain={[0, roundedMax]}
-            />
-            <Tooltip content={<ChartTooltipContent />} />
-
-            <Line
-              type="monotone"
-              dataKey="f"
-              stroke="#132676"
-              strokeWidth={3}
-              dot={false}
-              activeDot={{ r: 6, fill: "#132676", stroke: "#fff" }}
-              name="f"
-            />
-            <Line
-              type="monotone"
-              dataKey="g"
-              stroke="#2cde76"
-              strokeWidth={3}
-              dot={false}
-              activeDot={{ r: 6, fill: "#2cde76", stroke: "#fff" }}
-              name="g"
-            />
-            <Line
-              type="monotone"
-              dataKey="h"
-              stroke="#727272"
-              strokeWidth={3}
-              dot={false}
-              activeDot={{ r: 6, fill: "#727272", stroke: "#fff" }}
-              name="h"
-            />
-            <ReferenceLine
-              x={R_RentPayoutStart}
-              stroke="#444444"
-              strokeDasharray="3 3"
-              label={{
-                value: "Retirement",
-                position: "insideTopRight",
-                style: { fontSize: 10 },
-              }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </ChartContainer>
-    </div>
-
-    {/* ──────────────── Control panel ──────────────── */}
-    <div className="space-y-6">
-      {/* Monthly deposit */}
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">
-            Monthly Deposit (P_Deposit): €{P_Deposit}
-          </label>
-        </div>
-        <Slider
-          defaultValue={[P_Deposit]}
-          max={2000}
-          min={0}
-          step={10}
-          onValueChange={handleDepositChange}
-        />
+        <ResponsiveContainer width="100%" height={420}>   {/* 👈 420 px tall */}
+          <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
+              <CartesianGrid 
+                horizontal={true}
+                vertical={false}
+                stroke="#f0f0f0"
+                strokeDasharray="3 3" 
+              />
+              <XAxis 
+                dataKey="year" 
+                tick={{ fontSize: 10 }}
+                ticks={xAxisTicks}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis 
+                tick={{ fontSize: 10 }}
+                ticks={yAxisTicks}
+                tickFormatter={formatYAxis}
+                tickLine={false}
+                axisLine={false}
+                orientation="right"
+                domain={[0, roundedMax]}
+              />
+              <Tooltip content={<ChartTooltipContent />} />
+              <Line 
+                type="monotone" 
+                dataKey="f" 
+                stroke="#132676" 
+                strokeWidth={3}
+                dot={false} 
+                activeDot={{ r: 6, fill: "#0000FF", stroke: "#fff" }} 
+                name="f"
+              />
+              <Line 
+                type="monotone" 
+                dataKey="g" 
+                stroke="#2cde76" 
+                strokeWidth={3}
+                dot={false} 
+                activeDot={{ r: 6, fill: "#2cde76", stroke: "#fff" }} 
+                name="g"
+              />
+              <Line 
+                type="monotone" 
+                dataKey="h" 
+                stroke="#727272" 
+                strokeWidth={3}
+                dot={false} 
+                activeDot={{ r: 6, fill: "#727272", stroke: "#fff" }} 
+                name="h"
+              />
+              <ReferenceLine 
+                x={R_RentPayoutStart} 
+                stroke="#444444" 
+                strokeDasharray="3 3" 
+                label={{ 
+                  value: 'Retirement  ', 
+                  position: 'insideTopRight', 
+                  style: { fontSize: 10 } 
+                }} 
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartContainer>
       </div>
-
-      {/* Deposit growth rate */}
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">
-            Deposit Growth Rate (i_payIn): {i_payIn}%
-          </label>
+      
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Monthly Deposit (P_Deposit): €{P_Deposit}</label>
+          </div>
+          <Slider 
+            defaultValue={[P_Deposit]} 
+            max={2000}
+            min={0}
+            step={10}
+            onValueChange={handleDepositChange}
+          />
         </div>
-        <Slider
-          defaultValue={[i_payIn]}
-          max={10}
-          min={0}
-          step={0.1}
-          onValueChange={handlePayInRateChange}
-        />
-      </div>
-
-      {/* Market rate */}
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">
-            Market Rate (r_MrktRate): {r_MrktRate}%
-          </label>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Deposit Growth Rate (i_payIn): {i_payIn}%</label>
+          </div>
+          <Slider 
+            defaultValue={[i_payIn]} 
+            max={10}
+            min={0}
+            step={0.1}
+            onValueChange={handlePayInRateChange}
+          />
         </div>
-        <Slider
-          defaultValue={[r_MrktRate]}
-          max={10}
-          min={0}
-          step={0.1}
-          onValueChange={handleMarketRateChange}
-        />
-      </div>
-
-      {/* Payout increase rate */}
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">
-            Payout Increase Rate (i_PayoutIncrease): {i_PayoutIncrease}%
-          </label>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Market Rate (r_MrktRate): {r_MrktRate}%</label>
+          </div>
+          <Slider 
+            defaultValue={[r_MrktRate]} 
+            max={10}
+            min={0}
+            step={0.1}
+            onValueChange={handleMarketRateChange}
+          />
         </div>
-        <Slider
-          defaultValue={[i_PayoutIncrease]}
-          max={10}
-          min={0}
-          step={0.1}
-          onValueChange={handlePayoutIncreaseChange}
-        />
-      </div>
-
-      {/* Retirement start year */}
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">
-            Retirement Start Year (R_RentPayoutStart): {R_RentPayoutStart}
-          </label>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Payout Increase Rate (i_PayoutIncrease): {i_PayoutIncrease}%</label>
+          </div>
+          <Slider 
+            defaultValue={[i_PayoutIncrease]} 
+            max={10}
+            min={0}
+            step={0.1}
+            onValueChange={handlePayoutIncreaseChange}
+          />
         </div>
-        <Slider
-          defaultValue={[R_RentPayoutStart - currentYear]}
-          max={40}
-          min={5}
-          step={1}
-          onValueChange={handleRetirementStartChange}
-        />
-      </div>
-
-      {/* Retirement duration */}
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">
-            Retirement Duration (N_RentDuration): {N_RentDuration} years
-          </label>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Retirement Start Year (R_RentPayoutStart): {R_RentPayoutStart}</label>
+          </div>
+          <Slider 
+            defaultValue={[R_RentPayoutStart - currentYear]} 
+            max={40}
+            min={5}
+            step={1}
+            onValueChange={handleRetirementStartChange}
+          />
         </div>
-        <Slider
-          defaultValue={[N_RentDuration]}
-          max={50}
-          min={5}
-          step={1}
-          onValueChange={handleRetirementDurationChange}
-        />
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Retirement Duration (N_RentDuration): {N_RentDuration} years</label>
+          </div>
+          <Slider 
+            defaultValue={[N_RentDuration]} 
+            max={50}
+            min={5}
+            step={1}
+            onValueChange={handleRetirementDurationChange}
+          />
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default RetirementProjectionComponent;
