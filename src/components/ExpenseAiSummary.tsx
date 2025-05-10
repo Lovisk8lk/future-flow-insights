@@ -27,8 +27,8 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
             <TradeRepublicAiIcon />
           </div>
         </div>
-        <h3 className="text-lg font-semibold">Expense Intelligence <span className="text-xs bg-gray-200 px-2 py-1 rounded-full ml-2">BETA</span></h3>
-      </div>
+        <h3 className="text-lg font-semibold">Expense Intelligence</h3>
+        </div>
       <CardContent className="p-4">
         <p className="text-sm font-medium mb-4">
           Excellent expense management! Your spending this month shows consistent discipline in major categories.
