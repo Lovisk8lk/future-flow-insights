@@ -16,8 +16,15 @@ serve(async (req) => {
   }
 
   try {
-    // For now, we just use a fixed prompt as requested
-    const prompt = "Hello World!";
+    const { monthData, previousMonth } = await req.json();
+    
+    // Prepare a prompt with meaningful data if available
+    let prompt = "Hello World!";
+    
+    // If we have actual month data, we could use it to create a more relevant prompt
+    // But for now we'll stick with the specified prompt
+
+    console.log("Calling OpenAI with prompt:", prompt);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -36,8 +43,16 @@ serve(async (req) => {
       }),
     });
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI API error:', errorText);
+      throw new Error(`OpenAI API returned ${response.status}: ${errorText}`);
+    }
+
     const data = await response.json();
     const generatedText = data.choices[0].message.content;
+    
+    console.log("Generated text:", generatedText);
 
     return new Response(JSON.stringify({ generatedText }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

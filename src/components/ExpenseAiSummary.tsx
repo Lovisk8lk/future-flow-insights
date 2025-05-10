@@ -8,6 +8,8 @@ import {
   DialogTitle 
 } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type MonthCategorySummary = {
   month: string;
@@ -36,24 +38,27 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
       setIsLoading(true);
       setError(null);
       try {
-        // Make a request to our Supabase Edge Function
-        const response = await fetch('/.netlify/functions/generate-ai-summary', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({}),
+        // Call our Supabase Edge Function
+        const { data: result, error: functionError } = await supabase.functions.invoke('generate-ai-summary', {
+          body: {
+            monthData: data,
+            previousMonth: previousMonth
+          }
         });
         
-        if (!response.ok) {
-          throw new Error('Failed to fetch AI summary');
+        if (functionError) {
+          throw new Error('Failed to fetch AI summary: ' + functionError.message);
         }
         
-        const result = await response.json();
         setAiSummary(result.generatedText);
       } catch (err) {
         console.error('Error fetching AI summary:', err);
         setError('Failed to load AI insights. Using fallback text.');
+        toast({
+          title: "AI Summary Failed",
+          description: "Using fallback text instead",
+          variant: "destructive",
+        });
         // Fallback to the static text
         setAiSummary(null);
       } finally {
@@ -110,7 +115,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
             </p>
             <div className="space-y-1">
               {/* Netflix Card */}
-              <Link to="/subscription/netflix" className="block">
+              <Link to="/subscription/netflix?tab=expenses#expense-intelligence-card" className="block">
                 <div className="bg-white p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                   <div className="flex justify-between items-center">
                     <h4 className="font-medium text-base">Netflix Standard Plan</h4>
@@ -121,7 +126,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
               </Link>
               
               {/* Amazon Prime Card */}
-              <Link to="/subscription/amazon-prime" className="block">
+              <Link to="/subscription/amazon-prime?tab=expenses#expense-intelligence-card" className="block">
                 <div className="bg-white p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                   <div className="flex justify-between items-center">
                     <h4 className="font-medium text-base">Amazon Prime Subscription</h4>
