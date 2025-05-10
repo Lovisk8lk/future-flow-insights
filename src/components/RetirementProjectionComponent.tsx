@@ -294,14 +294,12 @@ const RetirementProjectionComponent: React.FC = () => {
     };
   }, [roundedMax]);
 
-  const startYear      = currentYear;
-  const firstDecade    = startYear - (startYear % 10);   // e.g. 2020
-  const lastDecade     = 2080;                           // ← change this if you ever want a different cap
-  
+  // ─── decade ticks: start at the first full decade *after* the current year ───
+  const firstDecadeTick = Math.ceil(currentYear / 10) * 10;   // 2025 → 2030
   const xAxisTicks = Array.from(
-    { length: Math.floor((lastDecade - firstDecade) / 10) + 1 },
-    (_, i) => firstDecade + i * 10
-  );   // ➜ [2020, 2030, 2040, 2050, 2060, 2070, 2080]
+    { length: Math.floor((lastYearToDisplay - firstDecadeTick) / 10) + 1 },
+    (_, i) => firstDecadeTick + i * 10
+  );   // ➜ [2030, 2040, 2050, … 2080]
 
   // Custom formatter for the Y-axis values
   const formatYAxis = (value: number) => {
