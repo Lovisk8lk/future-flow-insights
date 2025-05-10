@@ -463,10 +463,10 @@ const RetirementProjectionComponent: React.FC = () => {
                 <Line 
                   type="monotone" 
                   dataKey="g_prime" 
-                  stroke="#ffc107" 
+                  stroke="#cfecdc" 
                   strokeWidth={3}
                   dot={false} 
-                  activeDot={{ r: 6, fill: "#ffc107", stroke: "#fff" }} 
+                  activeDot={{ r: 6, fill: "#cfecdc", stroke: "#fff" }} 
                   name="g_prime"
                   animationDuration={1000}
                   animationEasing="ease-in-out"
@@ -475,14 +475,14 @@ const RetirementProjectionComponent: React.FC = () => {
                     value="Wealth (+€15)" 
                     position="top" 
                     offset={10}
-                    style={{ fontSize: 11, fill: "#ffc107", fontWeight: 500 }}
+                    style={{ fontSize: 11, fill: "#cfecdc", fontWeight: 500 }}
                   />
                 </Line>
                 {/* New enhanced pension line (h_prime) */}
                 <Line 
                   type="monotone" 
                   dataKey="h_prime" 
-                  stroke="#ffab40" 
+                  stroke="#bababa" 
                   strokeWidth={3}
                   dot={false} 
                   activeDot={{ r: 6, fill: "#bababa", stroke: "#fff" }} 
@@ -492,7 +492,7 @@ const RetirementProjectionComponent: React.FC = () => {
                 />
                 <ReferenceLine 
                   x={R_RentPayoutStart}
-                  stroke="#cfecdc" 
+                  stroke="#bababa" 
                   strokeDasharray="3 3" 
                   label={{ 
                     value: 'Retirement', 
