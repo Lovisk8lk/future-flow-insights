@@ -395,12 +395,11 @@ const RetirementProjectionComponent: React.FC = () => {
                 />
                 <ReferenceLine 
                   x={R_RentPayoutStart}
-                  y={100}
                   stroke="#444444" 
                   strokeDasharray="3 3" 
                   label={{ 
                     value: 'Retirement', 
-                    position: 'right', 
+                    position: 'insideTopRight', 
                     offset: 15,
                     style: { fontSize: 11, fontWeight: 500 } 
                   }} 
