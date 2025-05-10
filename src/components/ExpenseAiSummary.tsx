@@ -68,7 +68,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
                     <h4 className="font-medium text-base">Netflix Standard Plan</h4>
                     <p className="text-sm font-medium">€11.99</p>
                   </div>
-                  <p className="text-xs text-green-600 font-semibold">Worth €30k later</p>
+                  <p className="text-xs text-green-600 font-semibold">Worth €30k at Retirement</p>
                 </div>
               </Link>
               
@@ -79,7 +79,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
                     <h4 className="font-medium text-base">Amazon Prime Subscription</h4>
                     <p className="text-sm font-medium">€9.99</p>
                   </div>
-                  <p className="text-xs text-green-600 font-semibold">Worth €25k later</p>
+                  <p className="text-xs text-green-600 font-semibold">Worth €25k at Retirement</p>
                 </div>
               </Link>
             </div>
