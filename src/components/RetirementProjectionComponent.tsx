@@ -150,84 +150,73 @@ const RetirementProjectionComponent: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col px-5 py-4">
-      <div className="h-96 mb-5">
-        <div                       // 👈 make this fill its parent
-          style={{
-            height: "100%",        //  ✨ add this line
-            maxWidth: "110%",
-            width: "110%",
-            margin: "0 auto",
-            overflow: "hidden"
-          }}
-        >
-          <ChartContainer config={chartConfig} className="h-full">
-            <ResponsiveContainer width="100%" length="100%">
-              <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
-                <CartesianGrid 
-                  horizontal={true}
-                  vertical={false}
-                  stroke="#f0f0f0"
-                  strokeDasharray="3 3" 
-                />
-                <XAxis 
-                  dataKey="year" 
-                  tick={{ fontSize: 10 }}
-                  ticks={xAxisTicks}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis 
-                  tick={{ fontSize: 10 }}
-                  ticks={yAxisTicks}
-                  tickFormatter={formatYAxis}
-                  tickLine={false}
-                  axisLine={false}
-                  orientation="right"
-                  domain={[0, roundedMax]}
-                />
-                <Tooltip content={<ChartTooltipContent />} />
-                <Line 
-                  type="monotone" 
-                  dataKey="f" 
-                  stroke="#132676" 
-                  strokeWidth={3}
-                  dot={false} 
-                  activeDot={{ r: 6, fill: "#0000FF", stroke: "#fff" }} 
-                  name="f"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="g" 
-                  stroke="#2cde76" 
-                  strokeWidth={3}
-                  dot={false} 
-                  activeDot={{ r: 6, fill: "#2cde76", stroke: "#fff" }} 
-                  name="g"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="h" 
-                  stroke="#727272" 
-                  strokeWidth={3}
-                  dot={false} 
-                  activeDot={{ r: 6, fill: "#727272", stroke: "#fff" }} 
-                  name="h"
-                />
-                <ReferenceLine 
-                  x={R_RentPayoutStart} 
-                  stroke="#444444" 
-                  strokeDasharray="3 3" 
-                  label={{ 
-                    value: 'Retirement  ', 
-                    position: 'insideTopRight', 
-                    style: { fontSize: 10 } 
-                  }} 
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </div>
+    <div className="mb-8">               {/* no fixed height needed here */}
+      <ChartContainer config={chartConfig}>
+        <ResponsiveContainer width="100%" height={420}>   {/* 👈 420 px tall */}
+          <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
+              <CartesianGrid 
+                horizontal={true}
+                vertical={false}
+                stroke="#f0f0f0"
+                strokeDasharray="3 3" 
+              />
+              <XAxis 
+                dataKey="year" 
+                tick={{ fontSize: 10 }}
+                ticks={xAxisTicks}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis 
+                tick={{ fontSize: 10 }}
+                ticks={yAxisTicks}
+                tickFormatter={formatYAxis}
+                tickLine={false}
+                axisLine={false}
+                orientation="right"
+                domain={[0, roundedMax]}
+              />
+              <Tooltip content={<ChartTooltipContent />} />
+              <Line 
+                type="monotone" 
+                dataKey="f" 
+                stroke="#132676" 
+                strokeWidth={3}
+                dot={false} 
+                activeDot={{ r: 6, fill: "#0000FF", stroke: "#fff" }} 
+                name="f"
+              />
+              <Line 
+                type="monotone" 
+                dataKey="g" 
+                stroke="#2cde76" 
+                strokeWidth={3}
+                dot={false} 
+                activeDot={{ r: 6, fill: "#2cde76", stroke: "#fff" }} 
+                name="g"
+              />
+              <Line 
+                type="monotone" 
+                dataKey="h" 
+                stroke="#727272" 
+                strokeWidth={3}
+                dot={false} 
+                activeDot={{ r: 6, fill: "#727272", stroke: "#fff" }} 
+                name="h"
+              />
+              <ReferenceLine 
+                x={R_RentPayoutStart} 
+                stroke="#444444" 
+                strokeDasharray="3 3" 
+                label={{ 
+                  value: 'Retirement  ', 
+                  position: 'insideTopRight', 
+                  style: { fontSize: 10 } 
+                }} 
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartContainer>
       </div>
       
       <div className="space-y-6">
