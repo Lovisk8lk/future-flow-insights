@@ -485,14 +485,14 @@ const RetirementProjectionComponent: React.FC = () => {
                   stroke="#ffab40" 
                   strokeWidth={3}
                   dot={false} 
-                  activeDot={{ r: 6, fill: "#ffab40", stroke: "#fff" }} 
+                  activeDot={{ r: 6, fill: "#bababa", stroke: "#fff" }} 
                   name="h_prime"
                   animationDuration={1000}
                   animationEasing="ease-in-out"
                 />
                 <ReferenceLine 
                   x={R_RentPayoutStart}
-                  stroke="#444444" 
+                  stroke="#cfecdc" 
                   strokeDasharray="3 3" 
                   label={{ 
                     value: 'Retirement', 
