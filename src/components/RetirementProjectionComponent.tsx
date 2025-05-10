@@ -439,7 +439,7 @@ const RetirementProjectionComponent: React.FC = () => {
           </div>
           <Separator className="my-3 bg-gray-100" />
           <div className="text-xs text-[#8A898C]">
-            Approximation based on average market returns and current monthly deposits under assumed growth rate
+            Approximation based on average market returns and current monthly deposits adjusted for inflation
           </div>
         </div>
       </Card>
