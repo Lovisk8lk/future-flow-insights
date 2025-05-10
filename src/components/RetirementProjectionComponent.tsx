@@ -151,7 +151,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
   return (
     <div className="flex flex-col px-5 py-4">
-      <div className="h-[500] mb-5">
+      <div className="h-[100] mb-5">
         <div style={{ maxWidth: "110%", width: "110%", margin: "0 auto", overflow: "hidden"}}>
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
