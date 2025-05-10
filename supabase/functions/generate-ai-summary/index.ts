@@ -39,6 +39,7 @@ Monthly Data:
       prompt += `\nTop Spending Categories:\n`;
       monthData.categories.slice(0, 3).forEach(category => {
         prompt += `- ${category.category}: €${category.totalAmount.toFixed(0)}\n`;
+        console.log(`- ${category.category}: €${category.totalAmount.toFixed(0)}\n`);
       });
     }
 
@@ -46,6 +47,7 @@ Monthly Data:
     if (previousMonth) {
       const change = ((monthData.totalAmount - previousMonth.totalAmount) / previousMonth.totalAmount) * 100;
       prompt += `\nMonth-over-month total expense change: ${change.toFixed(1)}% (previous month: €${previousMonth.totalAmount.toFixed(0)})`;
+      console.log(`\nMonth-over-month total expense change: ${change.toFixed(1)}% (previous month: €${previousMonth.totalAmount.toFixed(0)})`);
     }
 
     // Add transaction details if available
@@ -56,6 +58,7 @@ Monthly Data:
         const date = transaction.bookingDate ? new Date(transaction.bookingDate).toLocaleDateString() : 'Unknown date';
         const description = transaction.transactionDescription || 'No description';
         prompt += `\n${index + 1}. ${date}: €${amount.toFixed(2)} - ${description}`;
+        console.log(`\n${index + 1}. ${date}: €${amount.toFixed(2)} - ${description}`);
       });
     }
 
