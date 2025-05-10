@@ -217,7 +217,6 @@ const RetirementProjectionComponent: React.FC = () => {
             </LineChart>
           </ResponsiveContainer>
         </ChartContainer>
-      </div>
       
       <div className="space-y-6">
         <div className="space-y-2">
@@ -297,8 +296,6 @@ const RetirementProjectionComponent: React.FC = () => {
             onValueChange={handleRetirementDurationChange}
           />
         </div>
-      </div>
-    </div>
   );
 };
 
