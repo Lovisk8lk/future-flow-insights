@@ -100,6 +100,9 @@ const RetirementProjectionComponent: React.FC = () => {
     return g_at_retirement * (adjustedNumerator / adjustedDenominator);
   })();
 
+  // Calculate monthly pension amount (divide annual amount by 12)
+  const monthlyPension = inflationAdjustedInterest / (N_RentDuration * 12);
+
   // Format currency for display
   const formatCurrency = (value: number) => {
     if (value >= 1000000) {
@@ -356,18 +359,18 @@ const RetirementProjectionComponent: React.FC = () => {
         </div>
       </div>
       
-      {/* Inflation-adjusted interest rate card */}
-      <Card className="mb-6 bg-[#F1F0FB] border-[#9b87f5]/20">
-        <div className="p-4">
-          <div className="flex justify-between items-center">
-            <div className="text-sm font-medium text-[#7E69AB]">Inflation-Adjusted Interest</div>
-            <div className="text-lg font-semibold text-[#9b87f5]">
-              {formatCurrency(inflationAdjustedInterest)}
+      {/* Trade Republic style minimalistic card */}
+      <Card className="mb-6 bg-white border-gray-100 shadow-sm">
+        <div className="p-5">
+          <div className="flex flex-col space-y-1">
+            <div className="text-sm font-normal text-[#403E43]">Expected Monthly Pension</div>
+            <div className="text-2xl font-semibold text-[#221F26]">
+              {formatCurrency(monthlyPension)}
             </div>
           </div>
-          <Separator className="my-2 bg-[#9b87f5]/10" />
-          <div className="text-xs text-[#8E9196]">
-            Based on a {N_RentDuration}-year retirement period with {i_PayoutIncrease}% annual payout increase and {r_MrktRate}% market rate
+          <Separator className="my-3 bg-gray-100" />
+          <div className="text-xs text-[#8A898C]">
+            Approximation based on average market returns and current monthly deposits under assumed growth rate
           </div>
         </div>
       </Card>
@@ -456,3 +459,4 @@ const RetirementProjectionComponent: React.FC = () => {
 };
 
 export default RetirementProjectionComponent;
+
