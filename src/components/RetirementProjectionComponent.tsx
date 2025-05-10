@@ -147,7 +147,7 @@ const RetirementProjectionComponent: React.FC = () => {
   const chartConfig = {
     f: { color: "#132676", label: "Function f(x)" },
     g: { color: "#2cde76", label: "Function g(x)" },
-    h: { color: "#000000", label: "Function h(x)" },
+    h: { color: "#727272", label: "Function h(x)" },
   };
 
   return (
@@ -183,7 +183,7 @@ const RetirementProjectionComponent: React.FC = () => {
                 type="monotone" 
                 dataKey="f" 
                 stroke="#132676" 
-                strokeWidth={3.5}
+                strokeWidth={3}
                 dot={false} 
                 activeDot={{ r: 6, fill: "#0000FF", stroke: "#fff" }} 
                 name="f"
@@ -192,7 +192,7 @@ const RetirementProjectionComponent: React.FC = () => {
                 type="monotone" 
                 dataKey="g" 
                 stroke="#2cde76" 
-                strokeWidth={3.5}
+                strokeWidth={3}
                 dot={false} 
                 activeDot={{ r: 6, fill: "#2cde76", stroke: "#fff" }} 
                 name="g"
@@ -200,10 +200,10 @@ const RetirementProjectionComponent: React.FC = () => {
               <Line 
                 type="monotone" 
                 dataKey="h" 
-                stroke="#000000" 
-                strokeWidth={3.5}
+                stroke="#727272" 
+                strokeWidth={3}
                 dot={false} 
-                activeDot={{ r: 6, fill: "#000000", stroke: "#fff" }} 
+                activeDot={{ r: 6, fill: "#727272", stroke: "#fff" }} 
                 name="h"
               />
               <ReferenceLine 
