@@ -64,7 +64,7 @@ const OnboardingFlow: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
             <div className="w-16 h-16 bg-finance-gray rounded-full flex items-center justify-center mb-8">
               <TrendingUp className="h-8 w-8 text-finance-black" />
             </div>
-            <h1 className="text-2xl font-bold mb-4">Welcome to your retirement planner</h1>
+            <h1 className="text-2xl font-bold mb-4">Welcome to your Analytics</h1>
             <p className="text-gray-600 mb-8 max-w-xs text-sm">
               Plan your financial future by forecasting your retirement savings.
             </p>
