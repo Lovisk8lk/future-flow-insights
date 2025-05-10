@@ -140,10 +140,12 @@ const ExpenseOverviewComponent: React.FC = () => {
                   <h3 className="font-bold text-lg">
                     Total Expenses: €{filteredMonthData.totalAmount.toFixed(0)}
                   </h3>
-                  {previousMonth && <span className={`text-lg text-right ${getChangeColor(parseFloat(calculateTotalChange() || "0"))}`}>
+                  <div className="text-right">
+                  {previousMonth && <span className={`text-lg ${getChangeColor(parseFloat(calculateTotalChange() || "0"))}`}>
                       {parseFloat(calculateTotalChange() || "0") > 0 ? "+" : ""}
                       {calculateTotalChange()}% vs prev month
                     </span>}
+                  </div>
                 </div>
                 
                 <Card className="overflow-hidden">
