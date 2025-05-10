@@ -179,16 +179,16 @@ const ExpenseOverviewComponent: React.FC = () => {
     return monthGroup.month === monthYearString;
   }) : monthCategoryGroups[monthCategoryGroups.length - 1]; // Get the most recent month (now at the end of the array)
 
-  // Get filtered transactions for the selected month
-  const filteredTransactions = selectedMonth ? transactions.filter(transaction => {
-    if (!transaction.bookingDate) return false;
+  // Get filtered transactions for the selected month - FIX: Move this AFTER selectedMonth is used above
+  const filteredTransactions = transactions.filter(transaction => {
+    if (!transaction.bookingDate || !selectedMonth) return false;
     const transDate = new Date(transaction.bookingDate);
     const [year, month] = selectedMonth.split('-');
     const selectedYear = parseInt(year);
     const selectedMonth = parseInt(month) - 1; // JavaScript months are 0-indexed
     
     return transDate.getFullYear() === selectedYear && transDate.getMonth() === selectedMonth;
-  }) : transactions;
+  });
 
   return <div className="flex flex-col px-5 py-4">
       {/* Month Filter Selector */}
