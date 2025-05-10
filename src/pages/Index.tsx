@@ -1,10 +1,13 @@
 
 import React, { useEffect } from "react";
-import { FinanceProvider } from "../contexts/FinanceContext";
+import { FinanceProvider, useFinance } from "../contexts/FinanceContext";
 import MainScreen from "../components/MainScreen";
 import { supabase } from "@/integrations/supabase/client";
+import Onboarding from "@/components/onboarding/Onboarding";
 
-const Index = () => {
+const IndexContent = () => {
+  const { hasCompletedOnboarding } = useFinance();
+
   // Preload AI summary when app starts
   useEffect(() => {
     const preloadAiSummary = async () => {
@@ -46,10 +49,14 @@ const Index = () => {
     preloadAiSummary();
   }, []);
 
+  return hasCompletedOnboarding ? <MainScreen /> : <Onboarding />;
+};
+
+const Index = () => {
   return (
     <div className="min-h-screen bg-white max-w-md mx-auto shadow-lg">
       <FinanceProvider>
-        <MainScreen />
+        <IndexContent />
       </FinanceProvider>
     </div>
   );
