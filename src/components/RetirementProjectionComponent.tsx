@@ -22,8 +22,8 @@ const RetirementProjectionComponent: React.FC = () => {
   const animationFrameRef = useRef<number | null>(null);
   const previousMaxRef = useRef<number | null>(null);
 
-  // Animation properties - increased from 800ms to 1800ms for slower animation
-  const animationDuration = 1800; // milliseconds
+  // Animation properties
+  const animationDuration = 800; // milliseconds
   const animationStartTimeRef = useRef<number | null>(null);
   
   useEffect(() => {
