@@ -1,99 +1,165 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
 import { Input } from "./ui/input";
+import { Slider } from "./ui/slider";
 import { ChartContainer, ChartTooltipContent } from "./ui/chart";
 
 const RetirementProjectionComponent: React.FC = () => {
   const { retirementData, updateRetirementData } = useFinance();
   const { 
-    monthlyDeposit, 
-    growthRate, 
-    depositGrowthRate,
-    marketRate,
-    retirementYearlyAmount,
-    retirementGrowthRate,
-    retirementStartYear
+    monthlyDeposit: P_Deposit, 
+    depositGrowthRate: i_payIn,
+    marketRate: r_MrktRate,
+    retirementStartYear: R_RentPayoutStart,
+    retirementGrowthRate: i_PayoutIncrease,
+    retirementDuration: N_RentDuration = 30 // Default value if not already in context
   } = retirementData;
 
-  const handleDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    updateRetirementData({ monthlyDeposit: value });
+  useEffect(() => {
+    // Ensure retirementDuration is set if it doesn't exist
+    if (retirementData.retirementDuration === undefined) {
+      updateRetirementData({ retirementDuration: 30 });
+    }
+  }, [retirementData, updateRetirementData]);
+
+  // Handle slider changes
+  const handleDepositChange = (value: number[]) => {
+    updateRetirementData({ monthlyDeposit: value[0] });
   };
 
-  const handleRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    updateRetirementData({ growthRate: value });
+  const handlePayInRateChange = (value: number[]) => {
+    updateRetirementData({ depositGrowthRate: value[0] });
   };
 
-  const handleMarketRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    updateRetirementData({ marketRate: value });
+  const handleMarketRateChange = (value: number[]) => {
+    updateRetirementData({ marketRate: value[0] });
   };
 
-  const handleRetirementYearlyAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    updateRetirementData({ retirementYearlyAmount: value });
+  const handlePayoutIncreaseChange = (value: number[]) => {
+    updateRetirementData({ retirementGrowthRate: value[0] });
   };
 
-  const handleRetirementGrowthRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    updateRetirementData({ retirementGrowthRate: value });
+  const handleRetirementStartChange = (value: number[]) => {
+    const currentYear = 2025;
+    updateRetirementData({ retirementStartYear: currentYear + value[0] });
+  };
+
+  const handleRetirementDurationChange = (value: number[]) => {
+    updateRetirementData({ retirementDuration: value[0] });
   };
 
   // Calculate the projection data based on the formulas
   const currentYear = 2025;
-  const yearsToProject = 40; // Project 40 years into the future
+  const yearsToProject = 60; // Project 60 years into the future to cover longer retirement periods
 
   // Prepare data for chart
   const chartData = Array(yearsToProject).fill(0).map((_, i) => {
     const year = currentYear + i;
     const x = i; // Years from now
     
-    // Function 1: Investment Growth
-    const investmentGrowth = monthlyDeposit * 12 * Math.pow(1 + depositGrowthRate / 100, x);
+    let f_value = 0;
+    let g_value = 0;
+    let h_value = 0;
     
-    // Function 2: Future Value of Retirement Annuity
-    let futureValueAnnuity = 0;
-    if (Math.abs(depositGrowthRate/100 - marketRate/100) < 0.0001) {
-      futureValueAnnuity = monthlyDeposit * 12 * x * Math.pow(1 + marketRate/100, x - 1);
-    } else {
-      futureValueAnnuity = monthlyDeposit * 12 * (
-        (Math.pow(1 + depositGrowthRate/100, x) - Math.pow(1 + marketRate/100, x)) / 
-        (depositGrowthRate/100 - marketRate/100)
-      );
+    // Function f(x) = P_Deposit * 12 * ((1 + i_payIn)^x - 1) / i_payIn
+    // Domain: x > 0 and x ≤ R_RentPayoutStart
+    if (x > 0 && year <= R_RentPayoutStart) {
+      f_value = P_Deposit * 12 * ((Math.pow(1 + i_payIn/100, x) - 1) / (i_payIn/100));
     }
     
-    // Function 3: Retirement Spending (only after retirement)
-    let retirementSpending = 0;
-    if (year >= retirementStartYear) {
-      const retirementYears = year - retirementStartYear;
-      
-      if (Math.abs(retirementGrowthRate/100 - marketRate/100) < 0.0001) {
-        retirementSpending = retirementYearlyAmount * retirementYears;
+    // Function g(x) = P_Deposit * 12 * ((1 + i_payIn)^x - (1 + r_MrktRate)^x) / (i_payIn - r_MrktRate)
+    // Domain: x > 0 and x ≤ R_RentPayoutStart
+    if (x > 0 && year <= R_RentPayoutStart) {
+      // Handle the case when i_payIn is very close to r_MrktRate
+      if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
+        g_value = P_Deposit * 12 * x * Math.pow(1 + i_payIn/100, x - 1);
       } else {
-        retirementSpending = retirementYearlyAmount * (marketRate/100) * (
-          (Math.pow(retirementGrowthRate/100 / (marketRate/100), retirementYears) - 1) / 
-          (retirementGrowthRate/100 - marketRate/100)
+        g_value = P_Deposit * 12 * (
+          (Math.pow(1 + i_payIn/100, x) - Math.pow(1 + r_MrktRate/100, x)) / 
+          (i_payIn/100 - r_MrktRate/100)
         );
+      }
+    }
+    
+    // Calculate C_growth when we reach retirement start
+    let C_growth = 0;
+    if (year === R_RentPayoutStart) {
+      const rentStartIndex = R_RentPayoutStart - currentYear;
+      let g_at_retirement = 0;
+      
+      // Recalculate g at retirement year
+      if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
+        g_at_retirement = P_Deposit * 12 * rentStartIndex * Math.pow(1 + i_payIn/100, rentStartIndex - 1);
+      } else {
+        g_at_retirement = P_Deposit * 12 * (
+          (Math.pow(1 + i_payIn/100, rentStartIndex) - Math.pow(1 + r_MrktRate/100, rentStartIndex)) / 
+          (i_payIn/100 - r_MrktRate/100)
+        );
+      }
+      
+      // C_growth formula
+      const numerator = (i_PayoutIncrease/100 - r_MrktRate/100);
+      const denominator = (Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1);
+      
+      // Check for division by zero or very small denominator
+      if (Math.abs(denominator) < 0.0001) {
+        C_growth = g_at_retirement;
+      } else {
+        C_growth = g_at_retirement * numerator / denominator;
+      }
+    }
+    
+    // Function h(x) calculation
+    // h(x) = C_growth * (1 + i_PayoutIncrease)^(x - R_RentPayoutStart) * (((1 + i_PayoutIncrease)/(1 + r_MrktRate))^(N_RentDuration - x + R_RentPayoutStart) - 1) / (i_PayoutIncrease - r_MrktRate)
+    // Domain: x ≥ R_RentPayoutStart and x - R_RentPayoutStart ≤ N_RentDuration
+    if (year >= R_RentPayoutStart && (year - R_RentPayoutStart) <= N_RentDuration) {
+      const rentStartIndex = R_RentPayoutStart - currentYear;
+      let g_at_retirement = 0;
+      
+      // Recalculate g at retirement year for C_growth
+      if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
+        g_at_retirement = P_Deposit * 12 * rentStartIndex * Math.pow(1 + i_payIn/100, rentStartIndex - 1);
+      } else {
+        g_at_retirement = P_Deposit * 12 * (
+          (Math.pow(1 + i_payIn/100, rentStartIndex) - Math.pow(1 + r_MrktRate/100, rentStartIndex)) / 
+          (i_payIn/100 - r_MrktRate/100)
+        );
+      }
+      
+      // Calculate C_growth here
+      const numerator = (i_PayoutIncrease/100 - r_MrktRate/100);
+      const denominator = (Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1);
+      
+      // Prevent division by zero
+      if (Math.abs(denominator) < 0.0001 || Math.abs(numerator) < 0.0001) {
+        C_growth = g_at_retirement;
+        h_value = C_growth * (N_RentDuration - (year - R_RentPayoutStart));
+      } else {
+        C_growth = g_at_retirement * numerator / denominator;
+        
+        // Calculate h(x)
+        const years_since_retirement = year - R_RentPayoutStart;
+        const years_left = N_RentDuration - years_since_retirement;
+        
+        const factor1 = Math.pow(1 + i_PayoutIncrease/100, years_since_retirement);
+        const factor2 = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), years_left) - 1;
+        
+        h_value = C_growth * factor1 * factor2 / (i_PayoutIncrease/100 - r_MrktRate/100);
       }
     }
     
     return {
       year,
-      investmentGrowth,
-      futureValueAnnuity,
-      retirementSpending,
+      f: f_value,
+      g: g_value,
+      h: h_value,
     };
   });
 
   // Find max value for Y-axis
-  const values = chartData.flatMap(d => [
-    d.investmentGrowth, 
-    d.futureValueAnnuity, 
-    d.retirementSpending
-  ]);
+  const values = chartData.flatMap(d => [d.f, d.g, d.h]);
   const maxValue = Math.max(...values.filter(v => !isNaN(v) && isFinite(v)));
   const roundedMax = Math.ceil(maxValue / 1000) * 1000;
   
@@ -121,21 +187,13 @@ const RetirementProjectionComponent: React.FC = () => {
 
   // Chart configuration for the colors
   const chartConfig = {
-    investmentGrowth: { color: "#25D366", label: "Investment Growth" },
-    futureValueAnnuity: { color: "#0EA5E9", label: "Future Value Annuity" },
-    retirementSpending: { color: "#333333", label: "Retirement Spending" },
+    f: { color: "#0000FF", label: "Function f(x)" },
+    g: { color: "#00FF00", label: "Function g(x)" },
+    h: { color: "#000000", label: "Function h(x)" },
   };
 
   return (
     <div className="flex flex-col px-5 py-4">
-      <h2 className="text-2xl font-bold mb-4">Portfolio</h2>
-      <div className="text-3xl font-bold mb-2">
-        {new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(chartData[0]?.investmentGrowth || 0)}
-      </div>
-      <div className="text-green-500 text-sm mb-6">
-        +{new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(monthlyDeposit)} ({growthRate}%)
-      </div>
-      
       <div className="h-64 mb-6">
         <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
@@ -165,33 +223,33 @@ const RetirementProjectionComponent: React.FC = () => {
               <Tooltip content={<ChartTooltipContent />} />
               <Line 
                 type="monotone" 
-                dataKey="investmentGrowth" 
-                stroke="#25D366" 
+                dataKey="f" 
+                stroke="#0000FF" 
                 strokeWidth={2}
                 dot={false} 
-                activeDot={{ r: 6, fill: "#25D366", stroke: "#fff" }} 
-                name="investmentGrowth"
+                activeDot={{ r: 6, fill: "#0000FF", stroke: "#fff" }} 
+                name="f"
               />
               <Line 
                 type="monotone" 
-                dataKey="futureValueAnnuity" 
-                stroke="#0EA5E9" 
+                dataKey="g" 
+                stroke="#00FF00" 
                 strokeWidth={2}
                 dot={false} 
-                activeDot={{ r: 6, fill: "#0EA5E9", stroke: "#fff" }} 
-                name="futureValueAnnuity"
+                activeDot={{ r: 6, fill: "#00FF00", stroke: "#fff" }} 
+                name="g"
               />
               <Line 
                 type="monotone" 
-                dataKey="retirementSpending" 
-                stroke="#333333" 
+                dataKey="h" 
+                stroke="#000000" 
                 strokeWidth={2}
                 dot={false} 
-                activeDot={{ r: 6, fill: "#333333", stroke: "#fff" }} 
-                name="retirementSpending"
+                activeDot={{ r: 6, fill: "#000000", stroke: "#fff" }} 
+                name="h"
               />
               <ReferenceLine 
-                x={retirementStartYear} 
+                x={R_RentPayoutStart} 
                 stroke="#444444" 
                 strokeDasharray="3 3" 
                 label={{ 
@@ -205,92 +263,83 @@ const RetirementProjectionComponent: React.FC = () => {
         </ChartContainer>
       </div>
       
-      <div className="mb-4">
-        <label htmlFor="monthly-deposit" className="block text-sm font-medium mb-1">
-          Monthly Deposit
-        </label>
-        <div className="relative">
-          <Input
-            id="monthly-deposit"
-            type="number"
-            value={monthlyDeposit}
-            onChange={handleDepositChange}
-            className="pl-8 bg-white border-gray-200 rounded-lg text-xl font-semibold h-14"
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Monthly Deposit (P_Deposit): €{P_Deposit}</label>
+          </div>
+          <Slider 
+            defaultValue={[P_Deposit]} 
+            max={2000}
+            min={0}
+            step={10}
+            onValueChange={handleDepositChange}
           />
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">€</span>
         </div>
-      </div>
-      
-      <div className="mb-4">
-        <label htmlFor="growth-rate" className="block text-sm font-medium mb-1">
-          Estimated Growth Rate
-        </label>
-        <div className="relative">
-          <Input
-            id="growth-rate"
-            type="number"
-            value={growthRate}
-            onChange={handleRateChange}
-            className="pr-8 bg-white border-gray-200 rounded-lg text-xl font-semibold h-14"
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Deposit Growth Rate (i_payIn): {i_payIn}%</label>
+          </div>
+          <Slider 
+            defaultValue={[i_payIn]} 
+            max={10}
+            min={0}
+            step={0.1}
+            onValueChange={handlePayInRateChange}
           />
-          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xl text-gray-400">%</span>
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">
-            {growthRate} % p.a.
-          </span>
         </div>
-      </div>
-      
-      <div className="mb-4">
-        <label htmlFor="market-rate" className="block text-sm font-medium mb-1">
-          Market Rate
-        </label>
-        <div className="relative">
-          <Input
-            id="market-rate"
-            type="number"
-            value={marketRate}
-            onChange={handleMarketRateChange}
-            className="pr-8 bg-white border-gray-200 rounded-lg text-xl font-semibold h-14"
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Market Rate (r_MrktRate): {r_MrktRate}%</label>
+          </div>
+          <Slider 
+            defaultValue={[r_MrktRate]} 
+            max={10}
+            min={0}
+            step={0.1}
+            onValueChange={handleMarketRateChange}
           />
-          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xl text-gray-400">%</span>
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">
-            {marketRate} % p.a.
-          </span>
         </div>
-      </div>
-      
-      <div className="mb-4">
-        <label htmlFor="retirement-yearly-amount" className="block text-sm font-medium mb-1">
-          Retirement Yearly Amount
-        </label>
-        <div className="relative">
-          <Input
-            id="retirement-yearly-amount"
-            type="number"
-            value={retirementYearlyAmount}
-            onChange={handleRetirementYearlyAmountChange}
-            className="pl-8 bg-white border-gray-200 rounded-lg text-xl font-semibold h-14"
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Payout Increase Rate (i_PayoutIncrease): {i_PayoutIncrease}%</label>
+          </div>
+          <Slider 
+            defaultValue={[i_PayoutIncrease]} 
+            max={10}
+            min={0}
+            step={0.1}
+            onValueChange={handlePayoutIncreaseChange}
           />
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">€</span>
         </div>
-      </div>
-      
-      <div className="mb-4">
-        <label htmlFor="retirement-growth-rate" className="block text-sm font-medium mb-1">
-          Retirement Growth Rate
-        </label>
-        <div className="relative">
-          <Input
-            id="retirement-growth-rate"
-            type="number"
-            value={retirementGrowthRate}
-            onChange={handleRetirementGrowthRateChange}
-            className="pr-8 bg-white border-gray-200 rounded-lg text-xl font-semibold h-14"
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Retirement Start Year (R_RentPayoutStart): {R_RentPayoutStart}</label>
+          </div>
+          <Slider 
+            defaultValue={[R_RentPayoutStart - currentYear]} 
+            max={40}
+            min={5}
+            step={1}
+            onValueChange={handleRetirementStartChange}
           />
-          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xl text-gray-400">%</span>
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">
-            {retirementGrowthRate} % p.a.
-          </span>
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Retirement Duration (N_RentDuration): {N_RentDuration} years</label>
+          </div>
+          <Slider 
+            defaultValue={[N_RentDuration]} 
+            max={50}
+            min={5}
+            step={1}
+            onValueChange={handleRetirementDurationChange}
+          />
         </div>
       </div>
     </div>

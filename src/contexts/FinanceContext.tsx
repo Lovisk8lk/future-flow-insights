@@ -12,6 +12,7 @@ type FinanceContextType = {
     retirementStartYear: number;
     portfolioValue: number[];
     savingsRate: number[];
+    retirementDuration?: number; // Added new parameter
   };
   updateRetirementData: (data: Partial<FinanceContextType["retirementData"]>) => void;
   expenses: {
@@ -37,6 +38,7 @@ const defaultContext: FinanceContextType = {
     retirementStartYear: 2053,
     portfolioValue: Array(40).fill(0).map((_, i) => 50000 + Math.pow(i, 2) * 1000 - (i > 30 ? Math.pow(i - 30, 3) * 300 : 0)),
     savingsRate: Array(40).fill(0).map((_, i) => i < 30 ? 300 - i * 6 : 300 - 30 * 6),
+    retirementDuration: 30, // Default to 30 years
   },
   updateRetirementData: () => {},
   expenses: {
