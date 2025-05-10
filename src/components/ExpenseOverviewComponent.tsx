@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useFinance } from "../contexts/FinanceContext";
 import { 
@@ -82,10 +81,10 @@ const ExpenseOverviewComponent: React.FC = () => {
         return group.month === monthYearString;
       });
       
-      // Get the next index (which is the previous month chronologically)
-      // since monthCategoryGroups is sorted most recent first
-      if (currentMonthIndex >= 0 && currentMonthIndex + 1 < monthCategoryGroups.length) {
-        setPreviousMonth(monthCategoryGroups[currentMonthIndex + 1]);
+      // Get the previous index (which is the previous month chronologically)
+      // since monthCategoryGroups is now sorted oldest first
+      if (currentMonthIndex >= 0 && currentMonthIndex - 1 >= 0) {
+        setPreviousMonth(monthCategoryGroups[currentMonthIndex - 1]);
       } else {
         setPreviousMonth(null);
       }
@@ -134,7 +133,7 @@ const ExpenseOverviewComponent: React.FC = () => {
           .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         return monthGroup.month === monthYearString;
       })
-    : monthCategoryGroups[0];
+    : monthCategoryGroups[monthCategoryGroups.length - 1]; // Get the most recent month (now at the end of the array)
 
   return (
     <div className="flex flex-col px-5 py-4">

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export type ExpenseTransaction = {
@@ -125,11 +124,11 @@ export const groupExpensesByMonth = (transactions: ExpenseTransaction[]) => {
     groups[monthKey].totalAmount += Math.abs(transaction.amount || 0);
   });
   
-  // Sort by date (most recent first)
+  // Sort by date (chronological order - oldest first)
   return Object.values(groups).sort((a, b) => {
     const dateA = new Date(a.month);
     const dateB = new Date(b.month);
-    return dateB.getTime() - dateA.getTime();
+    return dateA.getTime() - dateB.getTime();
   });
 };
 
@@ -245,10 +244,10 @@ export const groupExpensesByMonthAndCategory = (transactions: ExpenseTransaction
     month.categories.sort((a, b) => b.totalAmount - a.totalAmount);
   });
   
-  // Sort months by date (most recent first)
+  // Sort months by date (chronological order - oldest first)
   return Object.values(monthGroups).sort((a, b) => {
     const dateA = new Date(a.month);
     const dateB = new Date(b.month);
-    return dateB.getTime() - dateA.getTime();
+    return dateA.getTime() - dateB.getTime();
   });
 };
