@@ -301,9 +301,9 @@ const RetirementProjectionComponent: React.FC = () => {
 
   // Chart configuration for the colors
   const chartConfig = {
-    f: { color: "#132676", label: "Sum of all Investments" },
-    g: { color: "#2cde76", label: "Current Wealth" },
-    h: { color: "#727272", label: "Wealth after Pension Start" },
+    f: { color: "#132676", label: "All Investments" },
+    g: { color: "#2cde76", label: "Wealth" },
+    h: { color: "#727272", label: "Wealth during Pension" },
   };
 
   return (
