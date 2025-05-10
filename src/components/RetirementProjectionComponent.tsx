@@ -394,7 +394,7 @@ const RetirementProjectionComponent: React.FC = () => {
                   animationEasing="ease-in-out"
                 />
                 <ReferenceLine 
-                  x={R_RentPayoutStart}
+                  x={R_RentPayoutStart-100}
                   stroke="#444444" 
                   strokeDasharray="3 3" 
                   label={{ 
