@@ -18,11 +18,30 @@ serve(async (req) => {
   try {
     const { monthData, previousMonth } = await req.json();
     
-    // Prepare a prompt with meaningful data if available
-    let prompt = "Hello World!";
-    
-    // If we have actual month data, we could use it to create a more relevant prompt
-    // But for now we'll stick with the specified prompt
+    // Create a meaningful prompt based on the expense data
+    let prompt = `Analyze the following monthly expense data and provide a concise, personalized financial summary (about 2-3 sentences):
+
+Monthly Data:
+- Month: ${monthData.month || 'Current Month'}
+- Total Amount: €${monthData.totalAmount ? monthData.totalAmount.toFixed(0) : '0'}
+`;
+
+    // Add categories information if available
+    if (monthData.categories && monthData.categories.length > 0) {
+      prompt += `\nTop Spending Categories:\n`;
+      monthData.categories.slice(0, 3).forEach(category => {
+        prompt += `- ${category.category}: €${category.totalAmount.toFixed(0)}\n`;
+      });
+    }
+
+    // Add month-over-month comparison if available
+    if (previousMonth) {
+      const change = ((monthData.totalAmount - previousMonth.totalAmount) / previousMonth.totalAmount) * 100;
+      prompt += `\nMonth-over-month total expense change: ${change.toFixed(1)}% (previous month: €${previousMonth.totalAmount.toFixed(0)})`;
+    }
+
+    prompt += `\n\nProvide a short, insightful analysis of spending patterns, highlight any significant changes between months, and suggest one simple actionable tip for better financial management.
+Keep your response very concise - 2 to 3 sentences maximum. Use a friendly, professional tone. No introduction or greeting.`;
 
     console.log("Calling OpenAI with prompt:", prompt);
 
@@ -33,13 +52,13 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a helpful financial assistant.' },
+          { role: 'system', content: 'You are a helpful financial assistant that provides concise, personalized financial insights.' },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.01,
-        top_p: 0.01,
+        temperature: 0.7,
+        max_tokens: 150,
       }),
     });
 

@@ -17,6 +17,7 @@ export type Database = {
           id: string
           mcc: string | null
           side: string | null
+          transactionDescription: string | null
           type: string | null
           userId: string | null
         }
@@ -27,6 +28,7 @@ export type Database = {
           id: string
           mcc?: string | null
           side?: string | null
+          transactionDescription?: string | null
           type?: string | null
           userId?: string | null
         }
@@ -37,6 +39,7 @@ export type Database = {
           id?: string
           mcc?: string | null
           side?: string | null
+          transactionDescription?: string | null
           type?: string | null
           userId?: string | null
         }
