@@ -146,7 +146,7 @@ const RetirementProjectionComponent: React.FC = () => {
   // Chart configuration for the colors
   const chartConfig = {
     f: { color: "#132676", label: "Function f(x)" },
-    g: { color: "#489066", label: "Function g(x)" },
+    g: { color: "#489065", label: "Function g(x)" },
     h: { color: "#000000", label: "Function h(x)" },
   };
 
