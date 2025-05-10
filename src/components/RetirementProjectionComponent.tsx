@@ -367,7 +367,7 @@ const RetirementProjectionComponent: React.FC = () => {
     g: { color: "#2cde76", label: "Wealth" },
     h: { color: "#727272", label: "Remaining Pension" },
     g_prime: { color: "#cfecdc", label: "Wealth (+€15)" },
-    h_prime: { color: "#bababa", label: "Remaining Pension (+€15)" },
+    h_prime: { color: "#ededed", label: "Remaining Pension (+€15)" },
   };
 
   return (
@@ -482,17 +482,17 @@ const RetirementProjectionComponent: React.FC = () => {
                 <Line 
                   type="monotone" 
                   dataKey="h_prime" 
-                  stroke="#bababa" 
+                  stroke="#ededed" 
                   strokeWidth={3}
                   dot={false} 
-                  activeDot={{ r: 6, fill: "#bababa", stroke: "#fff" }} 
+                  activeDot={{ r: 6, fill: "#ededed", stroke: "#fff" }} 
                   name="h_prime"
                   animationDuration={1000}
                   animationEasing="ease-in-out"
                 />
                 <ReferenceLine 
                   x={R_RentPayoutStart}
-                  stroke="#bababa" 
+                  stroke="#ededed" 
                   strokeDasharray="3 3" 
                   label={{ 
                     value: 'Retirement', 
