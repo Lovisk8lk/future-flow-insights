@@ -366,8 +366,8 @@ const RetirementProjectionComponent: React.FC = () => {
     f: { color: "#132676", label: "Invested Capital" },
     g: { color: "#2cde76", label: "Wealth" },
     h: { color: "#727272", label: "Remaining Pension" },
-    g_prime: { color: "#ffc107", label: "Wealth (+€15)" },
-    h_prime: { color: "#ffab40", label: "Remaining Pension (+€15)" },
+    g_prime: { color: "#cfecdc", label: "Wealth (+€15)" },
+    h_prime: { color: "#bababa", label: "Remaining Pension (+€15)" },
   };
 
   return (
