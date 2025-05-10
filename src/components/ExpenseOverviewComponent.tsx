@@ -1,22 +1,12 @@
 
 import React, { useEffect, useState } from "react";
 import { useFinance } from "../contexts/FinanceContext";
-import { ShoppingBag, Calendar } from "lucide-react";
 import { 
   fetchExpensesByUserId, 
   ExpenseTransaction, 
   groupExpensesByMonthAndCategory,
-  getMCCCategory,
   fetchAvailableMonths
 } from "../utils/expenseUtils";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { 
   Select,
   SelectContent,
@@ -24,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue 
 } from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
 type MonthOption = {
   year: number;
@@ -49,6 +41,7 @@ const ExpenseOverviewComponent: React.FC = () => {
   const [monthCategoryGroups, setMonthCategoryGroups] = useState<MonthCategorySummary[]>([]);
   const [availableMonths, setAvailableMonths] = useState<MonthOption[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [previousMonth, setPreviousMonth] = useState<MonthCategorySummary | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const userId = "25e3564c-8bb9-4fdd-9dd7-cf0ec8c54c28";
 
@@ -78,8 +71,56 @@ const ExpenseOverviewComponent: React.FC = () => {
     loadExpenses();
   }, []);
 
+  useEffect(() => {
+    // Find the previous month data for comparison
+    if (selectedMonth && monthCategoryGroups.length > 1) {
+      const currentMonthIndex = monthCategoryGroups.findIndex(group => {
+        const [year, month] = selectedMonth.split('-');
+        const monthYearString = new Date(parseInt(year), parseInt(month) - 1, 1)
+          .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        return group.month === monthYearString;
+      });
+      
+      if (currentMonthIndex >= 0 && currentMonthIndex < monthCategoryGroups.length - 1) {
+        setPreviousMonth(monthCategoryGroups[currentMonthIndex + 1]);
+      } else {
+        setPreviousMonth(null);
+      }
+    }
+  }, [selectedMonth, monthCategoryGroups]);
+
   const handleMonthChange = (value: string) => {
     setSelectedMonth(value);
+  };
+
+  // Get the percentage change between current and previous month
+  const getPercentageChange = (currentAmount: number, previousAmount: number | undefined) => {
+    if (!previousAmount || previousAmount === 0) return null;
+    
+    const change = ((currentAmount - previousAmount) / previousAmount) * 100;
+    return change.toFixed(1);
+  };
+
+  // Get percentage change color
+  const getChangeColor = (change: number) => {
+    if (change > 0) return "text-red-500";
+    if (change < 0) return "text-green-500";
+    return "text-gray-500";
+  };
+
+  // Find category in previous month
+  const findPreviousMonthCategory = (categoryName: string) => {
+    if (!previousMonth) return null;
+    
+    return previousMonth.categories.find(cat => cat.category === categoryName);
+  };
+
+  // Calculate total percentage change between months
+  const calculateTotalChange = () => {
+    if (!previousMonth || !filteredMonthData) return null;
+    
+    const change = ((filteredMonthData.totalAmount - previousMonth.totalAmount) / previousMonth.totalAmount) * 100;
+    return change.toFixed(1);
   };
 
   // Filter expenses by selected month
@@ -94,92 +135,79 @@ const ExpenseOverviewComponent: React.FC = () => {
 
   return (
     <div className="flex flex-col px-5 py-4">
-      <h2 className="text-2xl font-bold mb-4">Expense Analysis</h2>
-      
+      {/* Month Filter Selector */}
       <div className="mb-6">
-        {/* Month Filter Selector */}
-        <div className="mb-6">
-          <label htmlFor="month-select" className="block text-sm font-medium mb-2">
-            Select Month
-          </label>
-          <Select value={selectedMonth} onValueChange={handleMonthChange}>
-            <SelectTrigger className="w-full md:w-[300px]">
-              <SelectValue placeholder="Select month" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableMonths.map((monthOption) => (
-                <SelectItem key={monthOption.value} value={monthOption.value}>
-                  {monthOption.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        {loading ? (
-          <div className="text-center py-4">Loading expenses data...</div>
-        ) : (
-          <>
-            {filteredMonthData ? (
-              <div className="border rounded-md overflow-hidden">
-                <div className="bg-gray-100 px-4 py-3 border-b">
-                  <h3 className="text-lg font-medium">{filteredMonthData.month}</h3>
-                  <p className="text-sm text-gray-600">Total: €{filteredMonthData.totalAmount.toFixed(2)}</p>
-                </div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>% of Month</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredMonthData.categories.map((category, categoryIndex) => (
-                      <TableRow key={categoryIndex}>
-                        <TableCell>{category.category}</TableCell>
-                        <TableCell>€{category.totalAmount.toFixed(2)}</TableCell>
-                        <TableCell>
-                          {((category.totalAmount / filteredMonthData.totalAmount) * 100).toFixed(1)}%
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className="text-center py-4">No data available for the selected month.</div>
-            )}
-          </>
-        )}
+        <Select value={selectedMonth} onValueChange={handleMonthChange}>
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue placeholder="Select month" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableMonths.map((monthOption) => (
+              <SelectItem key={monthOption.value} value={monthOption.value}>
+                {monthOption.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       
-      <div className="bg-gray-50 rounded-lg p-4 mb-4">
-        <h3 className="text-xl font-bold mb-2">AI Summary</h3>
-        <p className="mb-2">
+      {loading ? (
+        <div className="text-center py-4">Loading expenses data...</div>
+      ) : (
+        <>
           {filteredMonthData ? (
-            <>
-              For {filteredMonthData.month}, your highest spending category was{" "}
-              {filteredMonthData.categories[0]?.category || 'N/A'} with €
-              {filteredMonthData.categories[0]?.totalAmount.toFixed(2) || 'N/A'}, 
-              representing {((filteredMonthData.categories[0]?.totalAmount / filteredMonthData.totalAmount) * 100).toFixed(1)}% 
-              of your monthly expenses.
-            </>
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-4xl font-bold mb-2">{filteredMonthData.month}</h2>
+                <div className="flex items-baseline gap-3 mb-6">
+                  <h3 className="text-3xl font-bold">
+                    Total Expenses: €{filteredMonthData.totalAmount.toFixed(0)}
+                  </h3>
+                  {previousMonth && (
+                    <span className={`text-xl ${getChangeColor(parseFloat(calculateTotalChange() || "0"))}`}>
+                      {parseFloat(calculateTotalChange() || "0") > 0 ? "+" : ""}
+                      {calculateTotalChange()}% vs last month
+                    </span>
+                  )}
+                </div>
+                
+                <Card className="overflow-hidden">
+                  {filteredMonthData.categories.map((category, index) => {
+                    const prevCategory = findPreviousMonthCategory(category.category);
+                    const percentChange = prevCategory ? 
+                      getPercentageChange(category.totalAmount, prevCategory.totalAmount) : null;
+                    
+                    return (
+                      <div key={index} className={`flex items-center p-4 ${
+                        index !== filteredMonthData.categories.length - 1 ? "border-b" : ""
+                      }`}>
+                        <div className="w-1/4 font-semibold text-xl">{category.category}</div>
+                        <div className="w-1/2 px-4">
+                          <Progress 
+                            value={(category.totalAmount / filteredMonthData.totalAmount) * 100} 
+                            className="h-8 bg-gray-200"
+                          />
+                        </div>
+                        <div className="w-1/4 text-right">
+                          <div className="text-xl font-bold">{category.totalAmount.toFixed(0)} €</div>
+                          {percentChange && (
+                            <div className={getChangeColor(parseFloat(percentChange))}>
+                              {parseFloat(percentChange) > 0 ? "+" : ""}
+                              {percentChange}%
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </Card>
+              </div>
+            </div>
           ) : (
-            'Select a month to view your expense breakdown by category.'
+            <div className="text-center py-4">No data available for the selected month.</div>
           )}
-        </p>
-        <div className="h-10 mt-2">
-          <svg viewBox="0 0 100 20" className="w-full h-full">
-            <path 
-              d="M0,10 Q10,15 20,7 T40,10 T60,5 T80,12 T100,8" 
-              fill="none" 
-              stroke="#4097FF" 
-              strokeWidth="2" 
-            />
-          </svg>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };
