@@ -42,14 +42,14 @@ Monthly Data:
         prompt += `- ${category.category}: €${category.totalAmount.toFixed(0)}\n`;
         console.log(`- ${category.category}: €${category.totalAmount.toFixed(0)}\n`);
       });
-    }
+    } else {console.log('not month data received')}
 
     // Add month-over-month comparison if available
     if (previousMonth) {
       const change = ((monthData.totalAmount - previousMonth.totalAmount) / previousMonth.totalAmount) * 100;
       prompt += `\nMonth-over-month total expense change: ${change.toFixed(1)}% (previous month: €${previousMonth.totalAmount.toFixed(0)})`;
       console.log(`\nMonth-over-month total expense change: ${change.toFixed(1)}% (previous month: €${previousMonth.totalAmount.toFixed(0)})`);
-    }
+    } else {console.log('not previous month data received')}
 
     // Add transaction details if available
     if (transactions && transactions.length > 0) {
@@ -61,7 +61,7 @@ Monthly Data:
         prompt += `\n${index + 1}. ${date}: €${amount.toFixed(2)} - ${description}`;
         console.log(`\n${index + 1}. ${date}: €${amount.toFixed(2)} - ${description}`);
       });
-    }
+    } else {console.log('not transaction data received')}
 
     prompt += `\n\n1 to 2 sentences maximum. Use a friendly, professional tone. No introduction or greeting.`;
 
