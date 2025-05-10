@@ -5,6 +5,8 @@ import { useFinance } from "../contexts/FinanceContext";
 import { Input } from "./ui/input";
 import { Slider } from "./ui/slider";
 import { ChartContainer, ChartTooltipContent } from "./ui/chart";
+import { Card } from "./ui/card";
+import { Separator } from "./ui/separator";
 
 const RetirementProjectionComponent: React.FC = () => {
   const { retirementData, updateRetirementData } = useFinance();
@@ -83,6 +85,31 @@ const RetirementProjectionComponent: React.FC = () => {
   const denominator = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1;
   const C_growth = Math.abs(denominator) < 0.0001 ? g_at_retirement : g_at_retirement * numerator / denominator;
   
+  // Calculate inflation-adjusted interest rate
+  const inflationAdjustedInterest = (() => {
+    // Formula: g(R_RentPayoutStart) * (((1+i_PayoutIncrease)/(1+r_MrktRate))^N_RentDuration - 1)/(i_PayoutIncrease-r_MrktRate)
+    
+    // Check for division by zero
+    if (Math.abs(i_PayoutIncrease - r_MrktRate) < 0.0001) {
+      return g_at_retirement * N_RentDuration;
+    }
+    
+    const adjustedNumerator = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1;
+    const adjustedDenominator = i_PayoutIncrease/100 - r_MrktRate/100;
+    
+    return g_at_retirement * (adjustedNumerator / adjustedDenominator);
+  })();
+
+  // Format currency for display
+  const formatCurrency = (value: number) => {
+    if (value >= 1000000) {
+      return `€${(value / 1000000).toFixed(2)}M`;
+    } else if (value >= 1000) {
+      return `€${(value / 1000).toFixed(1)}k`;
+    }
+    return `€${value.toFixed(2)}`;
+  };
+
   const chartData = Array(yearsToProject).fill(0).map((_, i) => {
     const year = currentYear + i;
     const x = i;
@@ -329,6 +356,22 @@ const RetirementProjectionComponent: React.FC = () => {
         </div>
       </div>
       
+      {/* Inflation-adjusted interest rate card */}
+      <Card className="mb-6 bg-[#F1F0FB] border-[#9b87f5]/20">
+        <div className="p-4">
+          <div className="flex justify-between items-center">
+            <div className="text-sm font-medium text-[#7E69AB]">Inflation-Adjusted Interest</div>
+            <div className="text-lg font-semibold text-[#9b87f5]">
+              {formatCurrency(inflationAdjustedInterest)}
+            </div>
+          </div>
+          <Separator className="my-2 bg-[#9b87f5]/10" />
+          <div className="text-xs text-[#8E9196]">
+            Based on a {N_RentDuration}-year retirement period with {i_PayoutIncrease}% annual payout increase and {r_MrktRate}% market rate
+          </div>
+        </div>
+      </Card>
+      
       <div className="space-y-6">
         <div className="space-y-2">
           <div className="flex justify-between">
@@ -369,6 +412,44 @@ const RetirementProjectionComponent: React.FC = () => {
           />
         </div>
         
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Market Rate (r_MrktRate): {r_MrktRate}%</label>
+          </div>
+          <Slider 
+            defaultValue={[r_MrktRate]} 
+            max={15}
+            min={1}
+            step={0.1}
+            onValueChange={handleMarketRateChange}
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Retirement Growth Rate (i_PayoutIncrease): {i_PayoutIncrease}%</label>
+          </div>
+          <Slider 
+            defaultValue={[i_PayoutIncrease]} 
+            max={10}
+            min={0}
+            step={0.1}
+            onValueChange={handlePayoutIncreaseChange}
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <label className="text-sm font-medium">Retirement Duration (N_RentDuration): {N_RentDuration} years</label>
+          </div>
+          <Slider 
+            defaultValue={[N_RentDuration]} 
+            max={50}
+            min={10}
+            step={1}
+            onValueChange={handleRetirementDurationChange}
+          />
+        </div>
       </div>
     </div>
   );
