@@ -33,8 +33,7 @@ Constraints:
 
 Monthly Data:
 - Month: ${monthData.month || 'Current Month'}
-- Total Amount: €${monthData.totalAmount ? monthData.totalAmount.toFixed(0) : '0'}
-`;
+- Total Amount: €${monthData.totalAmount ? monthData.totalAmount.toFixed(0) : '0'}`;
 
     // Add categories information if available
     if (monthData.categories && monthData.categories.length > 0) {
