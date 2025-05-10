@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useFinance } from "../contexts/FinanceContext";
 import {
@@ -46,14 +47,14 @@ const RetirementProjectionComponent: React.FC = () => {
     
     // Define initial values
     let yearlyDeposit = monthlyDeposit * 12;
-    let total = 0;
     let payout = retirementYearlyAmount;
     
     // Take initialCapital into account if available
     const initialCapital = retirementData.initialCapital || 0;
     
     const dataPoints = [];
-    let total = initialCapital; // Start with initial capital
+    // Initialize total with initialCapital
+    let total = initialCapital;
     
     // Update the data structure based on the calculations
     for (let year = 0; year < totalYears; year++) {
