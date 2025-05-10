@@ -30,15 +30,15 @@ type FinanceContextType = {
 const defaultContext: FinanceContextType = {
   retirementData: {
     monthlyDeposit: 300,
-    growthRate: 3,
+    growthRate: 3, 
     depositGrowthRate: 1,
-    marketRate: 4,
+    marketRate: 6.1,
     retirementYearlyAmount: 24000,
-    retirementGrowthRate: 2,
-    retirementStartYear: 2053,
+    retirementGrowthRate: 2, // payout increase
+    retirementStartYear: 2075,
     portfolioValue: Array(40).fill(0).map((_, i) => 50000 + Math.pow(i, 2) * 1000 - (i > 30 ? Math.pow(i - 30, 3) * 300 : 0)),
     savingsRate: Array(40).fill(0).map((_, i) => i < 30 ? 300 - i * 6 : 300 - 30 * 6),
-    retirementDuration: 30, // Default to 30 years
+    retirementDuration: 20, // Default to 20 years
   },
   updateRetirementData: () => {},
   expenses: {
