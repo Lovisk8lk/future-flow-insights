@@ -39,7 +39,7 @@ const ExpenseOverviewComponent: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState<boolean>(false);
-  const userId = "25e3564c-8bb9-4fdd-9dd7-cf0ec8c54c28";
+  const userId = "9c9fdff3-26d0-485e-9e28-c98e967c8bdb";
 
   // Preload AI summary as early as possible
   useEffect(() => {
