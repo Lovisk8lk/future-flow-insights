@@ -16,7 +16,7 @@ export const fetchExpensesByUserId = async (userId: string) => {
     .from('banking_sample_data')
     .select('*')
     .eq('userId', userId)
-    .eq('CARD', type)
+    .eq('type', 'CARD')
 
   if (error) {
     console.error("Error fetching expenses:", error);
