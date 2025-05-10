@@ -19,7 +19,15 @@ serve(async (req) => {
     const { monthData, previousMonth, transactions } = await req.json();
     
     // Create a meaningful prompt based on the expense data
-    let prompt = `Analyze the following monthly expense data and provide a concise, personalized financial summary (about 2-3 sentences):
+    let prompt = `Analyze the attached customer transaction data to pinpoint under-used, duplicative, or low-value subscriptions that could be cancelled with minimal lifestyle impact—but do not display those findings.
+
+Output:
+A single, concise, upbeat in-app message that:
+
+1. Encourages the user by highlighting a positive recent spending habit (no numbers).
+2. Drives action by naming one specific low-value subscription to cancel and hinting at its long-term benefit (e.g. “Canceling [Service] could free up €X/month NOW to grow into €Y in Z years!”).
+
+Tone: Friendly, empowering, action-oriented, and urgent—celebrate progress and spotlight opportunity.
 
 Monthly Data:
 - Month: ${monthData.month || 'Current Month'}
