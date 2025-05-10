@@ -301,9 +301,9 @@ const RetirementProjectionComponent: React.FC = () => {
 
   // Chart configuration for the colors
   const chartConfig = {
-    f: { color: "#132676", label: "All Investments" },
-    g: { color: "#2cde76", label: "Wealth" },
-    h: { color: "#727272", label: "Wealth during Pension" },
+    f: { color: "#132676", label: "Function f(x)" },
+    g: { color: "#2cde76", label: "Function g(x)" },
+    h: { color: "#727272", label: "Function h(x)" },
   };
 
   return (
@@ -436,9 +436,9 @@ const RetirementProjectionComponent: React.FC = () => {
         </div>
       </Card>
       
-      <div className="flex flex-wrap gap-6">
+      <div className="flex justify-center gap-8">
         {/* Monthly Deposit Input Field */}
-        <div className="space-y-2">
+        <div className="space-y-2 w-32">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Monthly Deposit</label>
           </div>
@@ -450,14 +450,14 @@ const RetirementProjectionComponent: React.FC = () => {
               onBlur={handleDepositBlur}
               onKeyDown={handleDepositKeyDown}
               min="0"
-              className="pr-8 w-32"
+              className="pr-8 w-full"
             />
             <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
           </div>
         </div>
         
         {/* Retirement Year Select */}
-        <div className="space-y-2">
+        <div className="space-y-2 w-32">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Retirement Start Year</label>
           </div>
@@ -465,7 +465,7 @@ const RetirementProjectionComponent: React.FC = () => {
             value={R_RentPayoutStart.toString()} 
             onValueChange={handleRetirementYearChange}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select year" />
             </SelectTrigger>
             <SelectContent>
