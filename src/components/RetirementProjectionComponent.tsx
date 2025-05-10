@@ -152,8 +152,8 @@ const RetirementProjectionComponent: React.FC = () => {
 
   return (
     <div className="flex flex-col px-5 py-4">
-      <div className="flex-1" style={{ height: "500px", minHeight: "400px" }}>
-        <ChartContainer config={chartConfig} style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
+      <div className="h-64 mb-6">
+        <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
               <CartesianGrid 
