@@ -5,6 +5,11 @@ type FinanceContextType = {
   retirementData: {
     monthlyDeposit: number;
     growthRate: number;
+    depositGrowthRate: number;
+    marketRate: number;
+    retirementYearlyAmount: number;
+    retirementGrowthRate: number;
+    retirementStartYear: number;
     portfolioValue: number[];
     savingsRate: number[];
   };
@@ -25,6 +30,11 @@ const defaultContext: FinanceContextType = {
   retirementData: {
     monthlyDeposit: 300,
     growthRate: 3,
+    depositGrowthRate: 1,
+    marketRate: 4,
+    retirementYearlyAmount: 24000,
+    retirementGrowthRate: 2,
+    retirementStartYear: 2053,
     portfolioValue: Array(40).fill(0).map((_, i) => 50000 + Math.pow(i, 2) * 1000 - (i > 30 ? Math.pow(i - 30, 3) * 300 : 0)),
     savingsRate: Array(40).fill(0).map((_, i) => i < 30 ? 300 - i * 6 : 300 - 30 * 6),
   },
