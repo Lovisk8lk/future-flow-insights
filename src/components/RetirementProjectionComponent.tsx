@@ -85,8 +85,12 @@ const RetirementProjectionComponent: React.FC = () => {
   };
 
   // Calculate the projection data based on the formulas
+  // Calculate the projection data based on the formulas
   const currentYear = 2025;
-  const yearsToProject = 70; // Project 70 years into the future to cover longer retirement periods
+
+  // --- hard-cap the X-axis at 2080 and derive yearsToProject from it ---
+  const lastYearToDisplay = 2080;                       // ⇢ right-edge of chart
+  const yearsToProject    = lastYearToDisplay - currentYear + 1;
 
   // Generate years for the dropdown
   const retirementYearOptions = Array.from({ length: 71 }, (_, i) => currentYear + i + 1);
@@ -152,7 +156,7 @@ const RetirementProjectionComponent: React.FC = () => {
   };
 
   // Prepare data for chart
-  const chartData = Array(yearsToProject).fill(0).map((_, i) => {
+  const chartData = Array.from({ length: yearsToProject }, (_, i) => {
     const year = currentYear + i;
     const x = i;
     
@@ -337,8 +341,10 @@ const RetirementProjectionComponent: React.FC = () => {
                   stroke="#f0f0f0"
                   strokeDasharray="3 3" 
                 />
-                <XAxis 
-                  dataKey="year" 
+                <XAxis
+                  dataKey="year"
+                  type="number"                              /* NEW */
+                  domain={[currentYear, lastYearToDisplay]}  /* NEW */
                   tick={{ fontSize: 10 }}
                   ticks={xAxisTicks}
                   tickLine={false}
