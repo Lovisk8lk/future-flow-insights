@@ -4,7 +4,6 @@ import { useFinance } from "../contexts/FinanceContext";
 import TabNavigation from "./TabNavigation";
 import RetirementProjectionComponent from "./RetirementProjectionComponent";
 import ExpenseOverviewComponent from "./ExpenseOverviewComponent";
-import BottomNavigation from "./BottomNavigation";
 
 const MainScreen: React.FC = () => {
   const { activeTab } = useFinance();
@@ -25,8 +24,7 @@ const MainScreen: React.FC = () => {
           <ExpenseOverviewComponent />
         )}
       </main>
-      
-      <BottomNavigation />
+    
     </div>
   );
 };
