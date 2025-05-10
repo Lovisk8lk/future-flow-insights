@@ -25,7 +25,8 @@ Output:
 A single, concise, upbeat in-app message that:
 
 1. Encourages the user by highlighting a positive recent spending habit (no numbers).
-2. Drives action by naming one specific low-value subscription to cancel and hinting at its long-term benefit (e.g., Netflix, Amazon Prime) -> they are named in the data
+2. Drives action by naming one specific low-value subscription to cancel and hinting at its long-term benefit -> they are named in the data
+3. Point out alternatives like similar services in the same domain, or alternative cheaper alternatives like specific public transport tickets in the city of the user.
 
 Tone: Friendly, empowering, action-oriented, and urgent—celebrate progress and spotlight opportunity.
 
