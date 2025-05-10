@@ -19,20 +19,12 @@ serve(async (req) => {
     const { monthData, previousMonth, transactions } = await req.json();
     
     // Create a meaningful prompt based on the expense data
-    let prompt = `Task:
-Analyze the attached customer transaction data to pinpoint under-used, duplicative, or low-value subscriptions that could be cancelled with minimal lifestyle impact—but do not display those findings.
-
-Output:
-A single, concise, upbeat in-app message that:
-
-1. Encourages the user by highlighting a positive recent spending habit (no numbers).
-2. Drives action by naming one specific low-value subscription to cancel and hinting at its long-term benefit (e.g. “Canceling [Service] could free up €X/month NOW to grow into €Y in Z years!”).
-
-Tone: Friendly, empowering, action-oriented, and urgent—celebrate progress and spotlight opportunity.
+    let prompt = `Analyze the following monthly expense data and provide a concise, personalized financial summary (about 2-3 sentences):
 
 Monthly Data:
 - Month: ${monthData.month || 'Current Month'}
-- Total Amount: €${monthData.totalAmount ? monthData.totalAmount.toFixed(0) : '0'}`;
+- Total Amount: €${monthData.totalAmount ? monthData.totalAmount.toFixed(0) : '0'}
+`;
 
     // Add categories information if available
     if (monthData.categories && monthData.categories.length > 0) {
@@ -59,6 +51,9 @@ Monthly Data:
       });
     }
 
+    prompt += `\n\nProvide a short, insightful analysis of spending patterns, highlight any significant changes between months, and suggest one simple actionable tip for better financial management.
+Keep your response very concise - 2 to 3 sentences maximum. Use a friendly, professional tone. No introduction or greeting.`;
+
     // Log prompt for debugging
     console.log("Generated prompt with full context");
 
@@ -69,7 +64,7 @@ Monthly Data:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4-turbo',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: 'You are a helpful financial assistant that provides concise, personalized financial insights.' },
           { role: 'user', content: prompt }
