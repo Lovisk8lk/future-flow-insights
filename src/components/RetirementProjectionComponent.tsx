@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
 import { Input } from "./ui/input";
 import { Slider } from "./ui/slider";
@@ -299,9 +299,9 @@ const RetirementProjectionComponent: React.FC = () => {
     return `${(value / 1000).toLocaleString()}k`;
   };
 
-  // Chart configuration for the colors
+  // Chart configuration for the colors and labels
   const chartConfig = {
-    f: { color: "#132676", label: "Invested" },
+    f: { color: "#132676", label: "Invested Capital" },
     g: { color: "#2cde76", label: "Wealth" },
     h: { color: "#727272", label: "Remaining Pension" },
   };
@@ -356,7 +356,14 @@ const RetirementProjectionComponent: React.FC = () => {
                   name="f"
                   animationDuration={1000}
                   animationEasing="ease-in-out"
-                />
+                >
+                  <Label 
+                    value="Invested Capital" 
+                    position="insideBottom" 
+                    offset={10}
+                    style={{ fontSize: 11, fill: "#132676", fontWeight: 500 }}
+                  />
+                </Line>
                 <Line 
                   type="monotone" 
                   dataKey="g" 
@@ -367,7 +374,14 @@ const RetirementProjectionComponent: React.FC = () => {
                   name="g"
                   animationDuration={1000}
                   animationEasing="ease-in-out"
-                />
+                >
+                  <Label 
+                    value="Wealth" 
+                    position="top" 
+                    offset={10}
+                    style={{ fontSize: 11, fill: "#2cde76", fontWeight: 500 }}
+                  />
+                </Line>
                 <Line 
                   type="monotone" 
                   dataKey="h" 
@@ -384,9 +398,10 @@ const RetirementProjectionComponent: React.FC = () => {
                   stroke="#444444" 
                   strokeDasharray="3 3" 
                   label={{ 
-                    value: 'Retirement  ', 
+                    value: 'Retirement', 
                     position: 'insideTopRight', 
-                    style: { fontSize: 10 } 
+                    offset: 15,
+                    style: { fontSize: 11, fontWeight: 500 } 
                   }} 
                 />
               </LineChart>
