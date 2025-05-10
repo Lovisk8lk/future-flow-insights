@@ -12,7 +12,8 @@ type FinanceContextType = {
     retirementStartYear: number;
     portfolioValue: number[];
     savingsRate: number[];
-    retirementDuration?: number; // Added new parameter
+    retirementDuration?: number;
+    initialCapital?: number; // Added new parameter
   };
   updateRetirementData: (data: Partial<FinanceContextType["retirementData"]>) => void;
   expenses: {
@@ -25,6 +26,8 @@ type FinanceContextType = {
   };
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  hasCompletedOnboarding: boolean;
+  setHasCompletedOnboarding: (value: boolean) => void;
 };
 
 const defaultContext: FinanceContextType = {
@@ -39,6 +42,7 @@ const defaultContext: FinanceContextType = {
     portfolioValue: Array(40).fill(0).map((_, i) => 50000 + Math.pow(i, 2) * 1000 - (i > 30 ? Math.pow(i - 30, 3) * 300 : 0)),
     savingsRate: Array(40).fill(0).map((_, i) => i < 30 ? 300 - i * 6 : 300 - 30 * 6),
     retirementDuration: 20, // Default to 20 years
+    initialCapital: 0, // Default to 0
   },
   updateRetirementData: () => {},
   expenses: {
@@ -52,6 +56,8 @@ const defaultContext: FinanceContextType = {
   },
   activeTab: "retirement",
   setActiveTab: () => {},
+  hasCompletedOnboarding: false,
+  setHasCompletedOnboarding: () => {},
 };
 
 const FinanceContext = createContext<FinanceContextType>(defaultContext);
@@ -62,10 +68,20 @@ export const FinanceProvider: React.FC<{children: ReactNode}> = ({ children }) =
   const [retirementData, setRetirementData] = useState(defaultContext.retirementData);
   const [expenses] = useState(defaultContext.expenses);
   const [activeTab, setActiveTab] = useState(defaultContext.activeTab);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
+    // Check if user has completed onboarding before
+    const storedValue = localStorage.getItem('hasCompletedOnboarding');
+    return storedValue ? JSON.parse(storedValue) : false;
+  });
 
   const updateRetirementData = (data: Partial<FinanceContextType["retirementData"]>) => {
     setRetirementData(prev => ({ ...prev, ...data }));
   };
+
+  // Update localStorage when onboarding status changes
+  React.useEffect(() => {
+    localStorage.setItem('hasCompletedOnboarding', JSON.stringify(hasCompletedOnboarding));
+  }, [hasCompletedOnboarding]);
 
   return (
     <FinanceContext.Provider 
@@ -74,7 +90,9 @@ export const FinanceProvider: React.FC<{children: ReactNode}> = ({ children }) =
         updateRetirementData, 
         expenses, 
         activeTab, 
-        setActiveTab 
+        setActiveTab,
+        hasCompletedOnboarding,
+        setHasCompletedOnboarding
       }}
     >
       {children}

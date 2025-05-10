@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
@@ -25,7 +26,8 @@ const RetirementProjectionComponent: React.FC = () => {
     marketRate: r_MrktRate,
     retirementStartYear: R_RentPayoutStart,
     retirementGrowthRate: i_PayoutIncrease,
-    retirementDuration: N_RentDuration = 20 // Default value if not already in context
+    retirementDuration: N_RentDuration = 20, // Default value if not already in context
+    initialCapital = 0 // Get initialCapital with default value of 0
   } = retirementData;
   
   // Add animation state for Y-axis
@@ -92,12 +94,14 @@ const RetirementProjectionComponent: React.FC = () => {
   
   // Prepare data for chart
   const rentStartIndex = R_RentPayoutStart - currentYear;
-  let g_at_retirement = 0;
+  
+  // Include initialCapital in the calculation
+  let g_at_retirement = initialCapital; // Start with initial capital
   
   if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
-    g_at_retirement = P_Deposit * 12 * rentStartIndex * Math.pow(1 + i_payIn/100, rentStartIndex - 1);
+    g_at_retirement += P_Deposit * 12 * rentStartIndex * Math.pow(1 + i_payIn/100, rentStartIndex - 1);
   } else {
-    g_at_retirement = P_Deposit * 12 * (
+    g_at_retirement += P_Deposit * 12 * (
       (Math.pow(1 + i_payIn/100, rentStartIndex) - Math.pow(1 + r_MrktRate/100, rentStartIndex)) /
       (i_payIn/100 - r_MrktRate/100)
     );
@@ -162,13 +166,16 @@ const RetirementProjectionComponent: React.FC = () => {
     }
   
     if (x >= 1 && year <= R_RentPayoutStart) {
+      // Include initialCapital in g_value calculation
       if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
-        g_value = P_Deposit * 12 * x * Math.pow(1 + i_payIn/100, x - 1);
+        g_value = initialCapital * Math.pow(1 + r_MrktRate/100, x) + 
+                  P_Deposit * 12 * x * Math.pow(1 + i_payIn/100, x - 1);
       } else {
-        g_value = P_Deposit * 12 * (
-          (Math.pow(1 + i_payIn/100, x) - Math.pow(1 + r_MrktRate/100, x)) / 
-          (i_payIn/100 - r_MrktRate/100)
-        );
+        g_value = initialCapital * Math.pow(1 + r_MrktRate/100, x) + 
+                  P_Deposit * 12 * (
+                    (Math.pow(1 + i_payIn/100, x) - Math.pow(1 + r_MrktRate/100, x)) / 
+                    (i_payIn/100 - r_MrktRate/100)
+                  );
       }
     }
   

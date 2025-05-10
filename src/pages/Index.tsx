@@ -1,10 +1,14 @@
 
 import React, { useEffect } from "react";
-import { FinanceProvider } from "../contexts/FinanceContext";
+import { FinanceProvider, useFinance } from "../contexts/FinanceContext";
 import MainScreen from "../components/MainScreen";
+import OnboardingFlow from "../components/OnboardingFlow";
 import { supabase } from "@/integrations/supabase/client";
 
-const Index = () => {
+// Inner component to access context
+const IndexContent = () => {
+  const { hasCompletedOnboarding, setHasCompletedOnboarding } = useFinance();
+
   // Preload AI summary when app starts
   useEffect(() => {
     const preloadAiSummary = async () => {
@@ -46,12 +50,26 @@ const Index = () => {
     preloadAiSummary();
   }, []);
 
+  const handleOnboardingComplete = () => {
+    setHasCompletedOnboarding(true);
+  };
+
   return (
     <div className="min-h-screen bg-white max-w-md mx-auto shadow-lg">
-      <FinanceProvider>
+      {!hasCompletedOnboarding ? (
+        <OnboardingFlow onComplete={handleOnboardingComplete} />
+      ) : (
         <MainScreen />
-      </FinanceProvider>
+      )}
     </div>
+  );
+};
+
+const Index = () => {
+  return (
+    <FinanceProvider>
+      <IndexContent />
+    </FinanceProvider>
   );
 };
 
