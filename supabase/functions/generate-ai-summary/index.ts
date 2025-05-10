@@ -54,6 +54,9 @@ Monthly Data:
     prompt += `\n\nProvide a short, insightful analysis of spending patterns, highlight any significant changes between months, and suggest one simple actionable tip for better financial management.
 Keep your response very concise - 2 to 3 sentences maximum. Use a friendly, professional tone. No introduction or greeting.`;
 
+    // Log prompt for debugging
+    console.log("Generated prompt with full context");
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -83,7 +86,7 @@ Keep your response very concise - 2 to 3 sentences maximum. Use a friendly, prof
     console.log("Generated text:", generatedText);
 
     return new Response(JSON.stringify({ generatedText }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'max-age=86400' },
     });
   } catch (error) {
     console.error('Error in generate-ai-summary function:', error);

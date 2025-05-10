@@ -27,7 +27,8 @@ const IndexContent = () => {
         supabase.functions.invoke('generate-ai-summary', {
           body: {
             monthData: { month: "Current Month", totalAmount: 0, categories: [] },
-            previousMonth: null
+            previousMonth: null,
+            transactions: []  // Include empty transactions array for initial load
           }
         }).then(({ data, error }) => {
           if (error) {
@@ -39,6 +40,8 @@ const IndexContent = () => {
           if (data?.generatedText) {
             console.log("Successfully preloaded AI summary");
             sessionStorage.setItem('aiSummary', data.generatedText);
+            // Also store timestamp of when this summary was generated
+            sessionStorage.setItem('aiSummaryTimestamp', Date.now().toString());
           }
         });
       } catch (err) {

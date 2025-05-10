@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -34,12 +35,38 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [localAiSummary, setLocalAiSummary] = useState<string | null>(aiSummary);
   const [localIsLoading, setLocalIsLoading] = useState<boolean>(isLoading);
+  
+  // Cache key to identify unique data combinations
+  const getCacheKey = () => {
+    const monthKey = data.month;
+    const totalAmount = data.totalAmount;
+    const categoriesHash = data.categories.map(c => `${c.category}:${c.totalAmount}`).join('|');
+    return `ai_summary_${monthKey}_${totalAmount}_${categoriesHash}`;
+  };
 
   // Update AI summary when data changes
   useEffect(() => {
     const updateAiSummary = async () => {
       // Skip if we don't have real data yet or if we're already loading
       if (data.month === 'Current Month' || localIsLoading) return;
+      
+      // Get cache key for this specific data combination
+      const cacheKey = getCacheKey();
+      const cachedSummary = sessionStorage.getItem(cacheKey);
+      
+      // Use cached summary if available and not older than 24 hours
+      if (cachedSummary) {
+        const timestamp = sessionStorage.getItem(`${cacheKey}_timestamp`);
+        const summaryAge = timestamp ? Date.now() - parseInt(timestamp) : 0;
+        const MAX_CACHE_AGE = 24 * 60 * 60 * 1000; // 24 hours
+        
+        if (summaryAge < MAX_CACHE_AGE) {
+          console.log("Using cached AI summary for this specific data");
+          setLocalAiSummary(cachedSummary);
+          setLocalIsLoading(false);
+          return;
+        }
+      }
       
       setLocalIsLoading(true);
       try {
@@ -59,8 +86,14 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
         // Update with the new AI summary
         if (result.generatedText) {
           setLocalAiSummary(result.generatedText);
-          // Update session storage
+          
+          // Cache the result with this specific data key
+          sessionStorage.setItem(cacheKey, result.generatedText);
+          sessionStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+          
+          // Also update the general AI summary cache
           sessionStorage.setItem('aiSummary', result.generatedText);
+          sessionStorage.setItem('aiSummaryTimestamp', Date.now().toString());
         }
       } catch (err) {
         console.error('Error updating AI summary:', err);
