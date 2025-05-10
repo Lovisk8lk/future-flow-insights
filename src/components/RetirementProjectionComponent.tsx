@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
 import { Input } from "./ui/input";
@@ -15,7 +16,17 @@ const RetirementProjectionComponent: React.FC = () => {
     retirementGrowthRate: i_PayoutIncrease,
     retirementDuration: N_RentDuration = 30 // Default value if not already in context
   } = retirementData;
- 
+  
+  // Add animation state for Y-axis
+  const [yAxisAnimatedMax, setYAxisAnimatedMax] = useState<number | null>(null);
+  const [yAxisTicks, setYAxisTicks] = useState<number[]>([]);
+  const animationFrameRef = useRef<number | null>(null);
+  const previousMaxRef = useRef<number | null>(null);
+
+  // Animation properties
+  const animationDuration = 800; // milliseconds
+  const animationStartTimeRef = useRef<number | null>(null);
+  
   useEffect(() => {
     // Ensure retirementDuration is set if it doesn't exist
     if (retirementData.retirementDuration === undefined) {
@@ -120,13 +131,79 @@ const RetirementProjectionComponent: React.FC = () => {
   const maxValue = Math.max(...values.filter(v => !isNaN(v) && isFinite(v)));
   const roundedMax = Math.ceil(maxValue / 1000) * 1000;
   
-  // Create Y-axis ticks at 1/4, 1/2, 3/4 and max
-  const yAxisTicks = [
-    Math.round(roundedMax / 4),
-    Math.round(roundedMax / 2),
-    Math.round(roundedMax * 3 / 4),
-    roundedMax
-  ];
+  // Y-axis animation logic
+  useEffect(() => {
+    if (!previousMaxRef.current) {
+      // First render, set initial values without animation
+      previousMaxRef.current = roundedMax;
+      setYAxisAnimatedMax(roundedMax);
+      setYAxisTicks([
+        Math.round(roundedMax / 4),
+        Math.round(roundedMax / 2),
+        Math.round(roundedMax * 3 / 4),
+        roundedMax
+      ]);
+      return;
+    }
+
+    // If the max value changed, animate to the new value
+    if (roundedMax !== previousMaxRef.current) {
+      const startValue = previousMaxRef.current;
+      const targetValue = roundedMax;
+      const startTime = performance.now();
+      animationStartTimeRef.current = startTime;
+
+      // Cancel any running animation
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+
+      // Easing function for smooth animation
+      const easeOutCubic = (t: number): number => {
+        return 1 - Math.pow(1 - t, 3);
+      };
+
+      // Animation loop
+      const animateYAxis = (timestamp: number) => {
+        if (!animationStartTimeRef.current) return;
+        
+        const elapsed = timestamp - animationStartTimeRef.current;
+        const progress = Math.min(elapsed / animationDuration, 1);
+        const easedProgress = easeOutCubic(progress);
+        
+        // Interpolate between start and target values
+        const currentMax = startValue + (targetValue - startValue) * easedProgress;
+        setYAxisAnimatedMax(currentMax);
+        
+        // Update ticks with animated values
+        setYAxisTicks([
+          Math.round(currentMax / 4),
+          Math.round(currentMax / 2),
+          Math.round(currentMax * 3 / 4),
+          Math.round(currentMax)
+        ]);
+        
+        if (progress < 1) {
+          animationFrameRef.current = requestAnimationFrame(animateYAxis);
+        } else {
+          // Animation complete, update the previous max value
+          previousMaxRef.current = targetValue;
+          animationStartTimeRef.current = null;
+          animationFrameRef.current = null;
+        }
+      };
+      
+      // Start animation
+      animationFrameRef.current = requestAnimationFrame(animateYAxis);
+    }
+    
+    // Cleanup animation on unmount
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [roundedMax]);
 
   // Create X-axis ticks for decades only (2030, 2040, etc.)
   const startYear = currentYear;
@@ -152,14 +229,14 @@ const RetirementProjectionComponent: React.FC = () => {
   return (
     <div className="flex flex-col px-5 py-4">
       <div className="h-96 mb-5">
-        <div                       // 👈 make this fill its parent
+        <div                       
           style={{
-            height: "100%",        //  ✨ add this line
+            height: "100%",       
             maxWidth: "110%",
             width: "110%",
             margin: "0 auto",
             overflowX: "hidden",
-            overflowY: "visible", // allow vertical over-draw
+            overflowY: "visible", 
           }}
         >
           <ChartContainer config={chartConfig} className="h-full">
@@ -185,7 +262,8 @@ const RetirementProjectionComponent: React.FC = () => {
                   tickLine={false}
                   axisLine={false}
                   orientation="right"
-                  domain={[0, roundedMax]}
+                  domain={[0, yAxisAnimatedMax || roundedMax]}
+                  allowDataOverflow={true}
                 />
                 <Tooltip content={<ChartTooltipContent />} />
                 <Line 
@@ -196,6 +274,8 @@ const RetirementProjectionComponent: React.FC = () => {
                   dot={false} 
                   activeDot={{ r: 6, fill: "#0000FF", stroke: "#fff" }} 
                   name="f"
+                  animationDuration={600}
+                  animationEasing="ease-in-out"
                 />
                 <Line 
                   type="monotone" 
@@ -205,6 +285,8 @@ const RetirementProjectionComponent: React.FC = () => {
                   dot={false} 
                   activeDot={{ r: 6, fill: "#2cde76", stroke: "#fff" }} 
                   name="g"
+                  animationDuration={600}
+                  animationEasing="ease-in-out"
                 />
                 <Line 
                   type="monotone" 
@@ -214,6 +296,8 @@ const RetirementProjectionComponent: React.FC = () => {
                   dot={false} 
                   activeDot={{ r: 6, fill: "#727272", stroke: "#fff" }} 
                   name="h"
+                  animationDuration={600}
+                  animationEasing="ease-in-out"
                 />
                 <ReferenceLine 
                   x={R_RentPayoutStart} 
