@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 
 type MonthCategorySummary = {
   month: string;
@@ -25,6 +27,12 @@ interface ExpenseAiSummaryProps {
   transactions?: any[];
 }
 
+type Subscription = {
+  name: string;
+  price: string;
+  id: string;
+};
+
 const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
   data,
   previousMonth,
@@ -35,6 +43,22 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [localAiSummary, setLocalAiSummary] = useState<string | null>(aiSummary);
   const [localIsLoading, setLocalIsLoading] = useState<boolean>(isLoading);
+  const [selectedSubscription, setSelectedSubscription] = useState<string | null>(null);
+  const [authorized, setAuthorized] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const subscriptions: Subscription[] = [
+    { 
+      name: "Netflix Standard Plan", 
+      price: "€11.99", 
+      id: "netflix" 
+    },
+    { 
+      name: "Amazon Prime Subscription", 
+      price: "€9.99", 
+      id: "amazon-prime" 
+    }
+  ];
   
   // Cache key to identify unique data combinations
   const getCacheKey = () => {
@@ -108,6 +132,55 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
       updateAiSummary();
     }
   }, [data.month, data.totalAmount, previousMonth, transactions]);
+  
+  const handleSubscriptionSelect = (id: string) => {
+    setSelectedSubscription(id === selectedSubscription ? null : id);
+  };
+  
+  const handleCancel = async () => {
+    if (!selectedSubscription || !authorized) return;
+    
+    const subscription = subscriptions.find(s => s.id === selectedSubscription);
+    if (!subscription) return;
+    
+    setIsCancelling(true);
+    
+    try {
+      const response = await fetch('https://hook.eu2.make.com/662511lnb3alvmcpsryi4oke6wyrj2a7', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyName: subscription.id === 'netflix' ? 'Netflix' : 'Amazon Prime',
+          userEmail: 'max.mustermann@mail.com'
+        })
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: `Cancellation request sent for your ${subscription.name}.`,
+        });
+        
+        // Reset state
+        setSelectedSubscription(null);
+        setAuthorized(false);
+        setIsDialogOpen(false);
+      } else {
+        throw new Error('Failed to cancel subscription');
+      }
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send cancellation request. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   // Fallback text to use when AI generation fails
   const fallbackText = `Excellent expense management! Your spending this month shows consistent discipline in major categories.
@@ -141,30 +214,45 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
           </DialogHeader>
           <div className="py-0">
             <p className="text-sm text-gray-700 mb-2">
-              Adjust your monthly budget targets based on AI recommendations.
+              Adjust your monthly budget targets based on AI recommendations or cancel subscriptions.
             </p>
             <div className="space-y-1">
-              {/* Netflix Card */}
-              <Link to="/subscription/netflix?tab=expenses#expense-intelligence-card" className="block">
-                <div className="bg-white p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+              {/* Subscription Cards */}
+              {subscriptions.map((subscription) => (
+                <div 
+                  key={subscription.id}
+                  className={`bg-white p-3 rounded-lg cursor-pointer transition-colors ${selectedSubscription === subscription.id ? 'ring-2 ring-black' : 'hover:bg-gray-50'}`}
+                  onClick={() => handleSubscriptionSelect(subscription.id)}
+                >
                   <div className="flex justify-between items-center">
-                    <h4 className="font-medium text-base">Netflix Standard Plan</h4>
-                    <p className="text-sm font-medium">€11.99</p>
+                    <h4 className="font-medium text-base">{subscription.name}</h4>
+                    <p className="text-sm font-medium">{subscription.price}</p>
                   </div>
                   <p className="text-xs text-green-600 font-semibold">Worth €30k at Retirement</p>
                 </div>
-              </Link>
+              ))}
               
-              {/* Amazon Prime Card */}
-              <Link to="/subscription/amazon-prime?tab=expenses#expense-intelligence-card" className="block">
-                <div className="bg-white p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium text-base">Amazon Prime Subscription</h4>
-                    <p className="text-sm font-medium">€9.99</p>
-                  </div>
-                  <p className="text-xs text-green-600 font-semibold">Worth €25k at Retirement</p>
-                </div>
-              </Link>
+              {/* Authorization Checkbox */}
+              <div className="mt-4 flex items-start space-x-2">
+                <Checkbox 
+                  id="authorize" 
+                  checked={authorized}
+                  onCheckedChange={(checked) => setAuthorized(checked === true)} 
+                  className="mt-1"
+                />
+                <label htmlFor="authorize" className="text-xs text-gray-700">
+                  I authorize this app to cancel the selected subscriptions on my behalf and confirm I am the account holder.
+                </label>
+              </div>
+              
+              {/* Cancel Button */}
+              <Button
+                onClick={handleCancel}
+                disabled={!selectedSubscription || !authorized || isCancelling}
+                className="w-full mt-4 bg-black hover:bg-gray-800"
+              >
+                {isCancelling ? "Cancelling..." : "Cancel Subscription"}
+              </Button>
             </div>
           </div>
         </DialogContent>
