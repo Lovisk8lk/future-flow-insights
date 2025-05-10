@@ -249,7 +249,7 @@ const RetirementProjectionComponent: React.FC = () => {
             maxWidth: "110%",
             width: "110%",
             margin: "0 auto",
-            overflowX: "hidden",
+            overflowX: "visible",
             overflowY: "visible", 
           }}
         >
