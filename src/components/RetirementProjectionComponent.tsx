@@ -214,10 +214,11 @@ const RetirementProjectionComponent: React.FC = () => {
       previousMaxRef.current = roundedMax;
       setYAxisAnimatedMax(roundedMax);
       setYAxisTicks([
-        Math.round(roundedMax / 4),
-        Math.round(roundedMax / 2),
-        Math.round(roundedMax * 3 / 4),
-        Math.round(roundedMax)               // top tick = new axis top
+        Math.round(extendedMax / 4),
+        Math.round(extendedMax / 2),
+        Math.round(extendedMax * 3 / 4),
+        Math.round(roundedMax),
+        Math.round(extendedMax)               // top tick = new axis top
       ]);
       return;
     }
@@ -291,7 +292,7 @@ const RetirementProjectionComponent: React.FC = () => {
         clearTimeout(delayTimeoutRef.current);
       }
     };
-  }, [roundedMax]);
+  }, [extendedMax]);
 
   // Create X-axis ticks for decades only (2030, 2040, etc.)
   const startYear = currentYear;
