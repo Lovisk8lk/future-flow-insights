@@ -188,7 +188,7 @@ const RetirementProjectionComponent: React.FC = () => {
       
     return {
       year,
-      f: Math.Round(f_value),
+        f: f_va,
       g: g_value,
       h: h_value,
     };
