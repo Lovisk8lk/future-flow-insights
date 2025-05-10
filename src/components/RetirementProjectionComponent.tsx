@@ -273,7 +273,7 @@ const RetirementProjectionComponent: React.FC = () => {
                   dot={false} 
                   activeDot={{ r: 6, fill: "#0000FF", stroke: "#fff" }} 
                   name="f"
-                  animationDuration={600}
+                  animationDuration={1000}
                   animationEasing="ease-in-out"
                 />
                 <Line 
@@ -284,7 +284,7 @@ const RetirementProjectionComponent: React.FC = () => {
                   dot={false} 
                   activeDot={{ r: 6, fill: "#2cde76", stroke: "#fff" }} 
                   name="g"
-                  animationDuration={600}
+                  animationDuration={1000}
                   animationEasing="ease-in-out"
                 />
                 <Line 
@@ -295,7 +295,7 @@ const RetirementProjectionComponent: React.FC = () => {
                   dot={false} 
                   activeDot={{ r: 6, fill: "#727272", stroke: "#fff" }} 
                   name="h"
-                  animationDuration={600}
+                  animationDuration={1000}
                   animationEasing="ease-in-out"
                 />
                 <ReferenceLine 
