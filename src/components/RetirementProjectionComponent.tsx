@@ -351,7 +351,7 @@ const RetirementProjectionComponent: React.FC = () => {
                   tickLine={false}
                   axisLine={false}
                   orientation="right"
-                  domain={[0, (yAxisAnimatedMax || roundedMax*1.1)]}
+                  domain={[0, (yAxisAnimatedMax || roundedMax) * 1.1]}
                   allowDataOverflow
                 />
                 <Tooltip content={<ChartTooltipContent />} />
