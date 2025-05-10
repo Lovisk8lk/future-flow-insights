@@ -1,8 +1,7 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
-import { Input } from "./ui/input";
 import { Slider } from "./ui/slider";
 import { ChartContainer, ChartTooltipContent } from "./ui/chart";
 
@@ -41,11 +40,6 @@ const RetirementProjectionComponent: React.FC = () => {
     updateRetirementData({ retirementGrowthRate: value[0] });
   };
 
-  const handleRetirementStartChange = (value: number[]) => {
-    const currentYear = 2025;
-    updateRetirementData({ retirementStartYear: currentYear + value[0] });
-  };
-
   const handleRetirementDurationChange = (value: number[]) => {
     updateRetirementData({ retirementDuration: value[0] });
   };
@@ -53,6 +47,28 @@ const RetirementProjectionComponent: React.FC = () => {
   // Calculate the projection data based on the formulas
   const currentYear = 2025;
   const yearsToProject = 60; // Project 60 years into the future to cover longer retirement periods
+  
+  // Calculate fixed X-axis position (75% of visible range) for retirement line
+  const handleRetirementStartChange = (value: number[]) => {
+    const xPosition = value[0];
+    // Calculate the year that corresponds to 75% of the visible X-axis range
+    const calculatedYear = Math.round(currentYear + (xPosition * yearsToProject * 0.75) / 40);
+    updateRetirementData({ retirementStartYear: calculatedYear });
+  };
+
+  // Fix retirement line to 75% of the visible range
+  const visibleYearsRange = yearsToProject;
+  const retirementPosition = useMemo(() => {
+    // Calculate what year corresponds to 75% of the visible range
+    return Math.round(currentYear + visibleYearsRange * 0.75);
+  }, [visibleYearsRange]);
+
+  // Update context if current retirementStartYear doesn't match our fixed position
+  useEffect(() => {
+    if (R_RentPayoutStart !== retirementPosition) {
+      updateRetirementData({ retirementStartYear: retirementPosition });
+    }
+  }, [retirementPosition, R_RentPayoutStart, updateRetirementData]);
 
   // Prepare data for chart
   const rentStartIndex = R_RentPayoutStart - currentYear;
@@ -71,55 +87,57 @@ const RetirementProjectionComponent: React.FC = () => {
   const denominator = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1;
   const C_growth = Math.abs(denominator) < 0.0001 ? g_at_retirement : g_at_retirement * numerator / denominator;
   
-  const chartData = Array(yearsToProject).fill(0).map((_, i) => {
-    const year = currentYear + i;
-    const x = i;
-    
-    let f_value = null;
-    let g_value = null;
-    let h_value = null;
-    
-    if (x >= 1 && year <= R_RentPayoutStart) {
-      f_value = P_Deposit * 12 * ((Math.pow(1 + i_payIn/100, x) - 1) / (i_payIn/100));
-    }
-  
-    if (x >= 1 && year <= R_RentPayoutStart) {
-      if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
-        g_value = P_Deposit * 12 * x * Math.pow(1 + i_payIn/100, x - 1);
-      } else {
-        g_value = P_Deposit * 12 * (
-          (Math.pow(1 + i_payIn/100, x) - Math.pow(1 + r_MrktRate/100, x)) / 
-          (i_payIn/100 - r_MrktRate/100)
-        );
-      }
-    }
-  
-    if (x >= 1 && year >= R_RentPayoutStart && (year - R_RentPayoutStart) <= N_RentDuration) {
-      const years_since_retirement = year - R_RentPayoutStart;
-      const years_left = N_RentDuration - years_since_retirement;
-  
-      const factor1 = Math.pow(1 + i_PayoutIncrease/100, years_since_retirement);
-      const factor2 = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), years_left) - 1;
-  
-      if (Math.abs(i_PayoutIncrease/100 - r_MrktRate/100) < 0.0001 || Math.abs(factor2) < 0.0001) {
-        h_value = C_growth * (N_RentDuration - years_since_retirement);
-      } else {
-        h_value = C_growth * factor1 * factor2 / (i_PayoutIncrease/100 - r_MrktRate/100);
-      }
-    }
+  const chartData = useMemo(() => {
+    return Array(yearsToProject).fill(0).map((_, i) => {
+      const year = currentYear + i;
+      const x = i;
       
-    return {
-      year,
-      f: f_value,
-      g: g_value,
-      h: h_value,
-    };
-  });
+      let f_value = null;
+      let g_value = null;
+      let h_value = null;
+      
+      if (x >= 1 && year <= R_RentPayoutStart) {
+        f_value = P_Deposit * 12 * ((Math.pow(1 + i_payIn/100, x) - 1) / (i_payIn/100));
+      }
+    
+      if (x >= 1 && year <= R_RentPayoutStart) {
+        if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
+          g_value = P_Deposit * 12 * x * Math.pow(1 + i_payIn/100, x - 1);
+        } else {
+          g_value = P_Deposit * 12 * (
+            (Math.pow(1 + i_payIn/100, x) - Math.pow(1 + r_MrktRate/100, x)) / 
+            (i_payIn/100 - r_MrktRate/100)
+          );
+        }
+      }
+    
+      if (x >= 1 && year >= R_RentPayoutStart && (year - R_RentPayoutStart) <= N_RentDuration) {
+        const years_since_retirement = year - R_RentPayoutStart;
+        const years_left = N_RentDuration - years_since_retirement;
+    
+        const factor1 = Math.pow(1 + i_PayoutIncrease/100, years_since_retirement);
+        const factor2 = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), years_left) - 1;
+    
+        if (Math.abs(i_PayoutIncrease/100 - r_MrktRate/100) < 0.0001 || Math.abs(factor2) < 0.0001) {
+          h_value = C_growth * (N_RentDuration - years_since_retirement);
+        } else {
+          h_value = C_growth * factor1 * factor2 / (i_PayoutIncrease/100 - r_MrktRate/100);
+        }
+      }
+        
+      return {
+        year,
+        f: f_value,
+        g: g_value,
+        h: h_value,
+      };
+    });
+  }, [P_Deposit, i_payIn, r_MrktRate, R_RentPayoutStart, i_PayoutIncrease, N_RentDuration, C_growth, currentYear]);
 
-  // Find max value for Y-axis
+  // Find max value for Y-axis with a buffer for better visibility
   const values = chartData.flatMap(d => [d.f, d.g, d.h]);
   const maxValue = Math.max(...values.filter(v => !isNaN(v) && isFinite(v)));
-  const roundedMax = Math.ceil(maxValue / 1000) * 1000;
+  const roundedMax = Math.ceil(maxValue / 1000) * 1000 * 1.1; // Add 10% buffer
   
   // Create Y-axis ticks at 1/4, 1/2, 3/4 and max
   const yAxisTicks = [
@@ -145,17 +163,18 @@ const RetirementProjectionComponent: React.FC = () => {
 
   // Chart configuration for the colors
   const chartConfig = {
-    f: { color: "#132676", label: "Function f(x)" },
-    g: { color: "#2cde76", label: "Function g(x)" },
-    h: { color: "#727272", label: "Function h(x)" },
+    f: { color: "#132676", label: "Initial Deposits" },
+    g: { color: "#2cde76", label: "Growth Phase" },
+    h: { color: "#727272", label: "Retirement Phase" },
   };
 
   return (
     <div className="flex flex-col px-5 py-4">
-      <div className="h-64 mb-6">
+      {/* Increase the chart height with responsive container */}
+      <div className="h-[400px] mb-6">
         <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
+            <LineChart data={chartData} margin={{ top: 10, right: 30, left: 5, bottom: 10 }}>
               <CartesianGrid 
                 horizontal={true}
                 vertical={false}
@@ -185,7 +204,7 @@ const RetirementProjectionComponent: React.FC = () => {
                 stroke="#132676" 
                 strokeWidth={3}
                 dot={false} 
-                activeDot={{ r: 6, fill: "#0000FF", stroke: "#fff" }} 
+                activeDot={{ r: 6, fill: "#132676", stroke: "#fff" }} 
                 name="f"
               />
               <Line 
@@ -207,7 +226,7 @@ const RetirementProjectionComponent: React.FC = () => {
                 name="h"
               />
               <ReferenceLine 
-                x={R_RentPayoutStart} 
+                x={retirementPosition} 
                 stroke="#444444" 
                 strokeDasharray="3 3" 
                 label={{ 
@@ -228,6 +247,7 @@ const RetirementProjectionComponent: React.FC = () => {
           </div>
           <Slider 
             defaultValue={[P_Deposit]} 
+            value={[P_Deposit]}
             max={2000}
             min={0}
             step={10}
@@ -241,6 +261,7 @@ const RetirementProjectionComponent: React.FC = () => {
           </div>
           <Slider 
             defaultValue={[i_payIn]} 
+            value={[i_payIn]}
             max={10}
             min={0}
             step={0.1}
@@ -254,6 +275,7 @@ const RetirementProjectionComponent: React.FC = () => {
           </div>
           <Slider 
             defaultValue={[r_MrktRate]} 
+            value={[r_MrktRate]}
             max={10}
             min={0}
             step={0.1}
@@ -267,6 +289,7 @@ const RetirementProjectionComponent: React.FC = () => {
           </div>
           <Slider 
             defaultValue={[i_PayoutIncrease]} 
+            value={[i_PayoutIncrease]}
             max={10}
             min={0}
             step={0.1}
@@ -276,14 +299,17 @@ const RetirementProjectionComponent: React.FC = () => {
         
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Retirement Start Year (R_RentPayoutStart): {R_RentPayoutStart}</label>
+            <label className="text-sm font-medium">Retirement Year: {retirementPosition} (Fixed at 75% of timeline)</label>
           </div>
+          {/* This slider is now just visual, as retirement year is fixed at 75% */}
           <Slider 
-            defaultValue={[R_RentPayoutStart - currentYear]} 
+            defaultValue={[40]} 
+            value={[40]}
             max={40}
             min={5}
             step={1}
-            onValueChange={handleRetirementStartChange}
+            disabled={true}
+            className="opacity-50"
           />
         </div>
         
@@ -293,6 +319,7 @@ const RetirementProjectionComponent: React.FC = () => {
           </div>
           <Slider 
             defaultValue={[N_RentDuration]} 
+            value={[N_RentDuration]}
             max={50}
             min={5}
             step={1}
