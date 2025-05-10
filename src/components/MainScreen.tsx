@@ -7,7 +7,7 @@ import ExpenseOverviewComponent from "./ExpenseOverviewComponent";
 import BottomNavigation from "./BottomNavigation";
 
 const MainScreen: React.FC = () => {
-  const { activeTab, isLoading } = useFinance();
+  const { activeTab } = useFinance();
 
   return (
     <div className="flex flex-col min-h-screen bg-white">

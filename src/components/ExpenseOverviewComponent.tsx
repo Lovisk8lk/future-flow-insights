@@ -1,69 +1,67 @@
 
 import React from "react";
 import { useFinance } from "../contexts/FinanceContext";
-import MonthSelectorComponent from "./MonthSelectorComponent";
-import ExpenseCategoryRowComponent from "./ExpenseCategoryRowComponent";
-import AISummaryComponent from "./AISummaryComponent";
+import { ShoppingBag, Home, Car, Music } from "lucide-react";
 
 const ExpenseOverviewComponent: React.FC = () => {
-  const { expenses, isLoading, error } = useFinance();
+  const { expenses } = useFinance();
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col px-5 py-4">
-        <p className="text-center py-10">Loading expense data...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col px-5 py-4">
-        <p className="text-center py-10 text-red-500">Error: {error}</p>
-      </div>
-    );
-  }
+  // Map icon names to components
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case "shopping-bag":
+        return <ShoppingBag size={20} />;
+      case "home":
+        return <Home size={20} />;
+      case "car":
+        return <Car size={20} />;
+      case "music":
+        return <Music size={20} />;
+      default:
+        return <ShoppingBag size={20} />;
+    }
+  };
 
   return (
     <div className="flex flex-col px-5 py-4">
-      <h2 className="text-4xl font-bold mb-2">Expenses</h2>
-      <MonthSelectorComponent />
-      
-      <h3 className="text-3xl font-bold text-gray-400 mb-8">{expenses.month}</h3>
+      <h2 className="text-2xl font-bold mb-4">Expense Analysis</h2>
       
       <div className="mb-6">
-        <div className="flex justify-between items-end mb-4">
-          <h2 className="text-3xl font-bold">
-            Total Expenses: €{expenses.total.toLocaleString('de-DE')}
-          </h2>
-          <div className={`text-xl ${expenses.change > 0 ? 'text-red-500' : 'text-green-500'}`}>
-            {expenses.change > 0 ? '+' : ''}
-            {expenses.change}% vs last month
+        <h3 className="text-2xl font-bold mb-4">{expenses.month}</h3>
+        
+        {expenses.categories.map((category, index) => (
+          <div 
+            key={index} 
+            className="flex items-center justify-between py-4 border-b border-gray-100"
+          >
+            <div className="flex items-center">
+              <div className="w-8 h-8 flex items-center justify-center mr-3">
+                {getIcon(category.icon)}
+              </div>
+              <span className="font-medium">{category.name}</span>
+            </div>
+            <span className="font-bold">
+              €{category.amount}
+            </span>
           </div>
-        </div>
-
-        {expenses.investedAmount > 0 && (
-          <div className="mb-6">
-            <h3 className="text-xl font-bold text-gray-700">
-              Invested this month: €{expenses.investedAmount.toLocaleString('de-DE')}
-            </h3>
-          </div>
-        )}
-
-        <AISummaryComponent />
+        ))}
       </div>
       
-      <div className="mb-6">
-        {expenses.categories.map((category, index) => (
-          <ExpenseCategoryRowComponent
-            key={index}
-            name={category.name}
-            amount={category.amount}
-            icon={category.icon}
-            change={category.change}
-            percentage={category.percentage || 0}
-          />
-        ))}
+      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+        <h3 className="text-xl font-bold mb-2">AI Summary</h3>
+        <p className="mb-2">
+          Your savings rate has not changed since last month. Avoid dining out to increase it.
+        </p>
+        <div className="h-10 mt-2">
+          <svg viewBox="0 0 100 20" className="w-full h-full">
+            <path 
+              d="M0,10 Q10,15 20,7 T40,10 T60,5 T80,12 T100,8" 
+              fill="none" 
+              stroke="#4097FF" 
+              strokeWidth="2" 
+            />
+          </svg>
+        </div>
       </div>
     </div>
   );
