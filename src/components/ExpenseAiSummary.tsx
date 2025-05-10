@@ -56,42 +56,29 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-finance-gray border-none w-full max-w-none sm:max-w-[calc(100vw-2rem)] md:max-w-[500px] lg:max-w-[550px] min-h-[450px]">
+        <DialogContent className="bg-finance-gray border-none max-w-[350px] min-h-[340px]">
           <DialogHeader>
             <DialogTitle>Refine Your Budget</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <p className="text-sm text-gray-700">
-              Use this tool to adjust your monthly budget targets based on AI recommendations
-              and your spending habits.
+          <div className="py-3">
+            <p className="text-xs text-gray-700 mb-3">
+              Adjust your monthly budget targets based on AI recommendations.
             </p>
-            <div className="mt-4 space-y-2">
+            <div className="space-y-2">
               {data.categories.slice(0, 3).map((category, index) => (
-                <div key={index} className="bg-white p-3 rounded-lg">
-                  <h4 className="font-medium">{category.category}</h4>
-                  <p className="text-sm text-gray-500">Current spending: €{category.totalAmount.toFixed(0)}</p>
+                <div key={index} className="bg-white p-2 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-medium text-sm">{category.category}</h4>
+                    <p className="text-xs font-medium">€{Math.round(category.totalAmount * 0.9)}</p>
+                  </div>
+                  <p className="text-[10px] text-gray-500">-10% from €{category.totalAmount.toFixed(0)}</p>
                 </div>
               ))}
             </div>
             
-            <div className="mt-6">
-              <h4 className="font-medium mb-2">Your Targets</h4>
-              <div className="space-y-2">
-                {data.categories.slice(0, 3).map((category, index) => (
-                  <div key={index} className="bg-white p-3 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-medium">{category.category}</h4>
-                      <p className="text-sm font-medium">€{Math.round(category.totalAmount * 0.9)}</p>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Recommended: 10% reduction</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="mt-8">
+            <div className="mt-4">
               <button
-                className="w-full bg-black text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+                className="w-full bg-black text-white py-2 px-4 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors"
               >
                 Save Budget Targets
               </button>
