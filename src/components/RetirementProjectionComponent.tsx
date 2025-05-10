@@ -220,7 +220,7 @@ const RetirementProjectionComponent: React.FC = () => {
                   stroke="#444444" 
                   strokeDasharray="3 3" 
                   label={{ 
-                    value: 'Retirement  ', 
+                    value: '2070', 
                     position: 'insideTopRight', 
                     style: { fontSize: 10 } 
                   }} 
