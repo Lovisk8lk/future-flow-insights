@@ -152,6 +152,8 @@ const RetirementProjectionComponent: React.FC = () => {
   };
 
   // Prepare data for chart
+  const yearsToProject = lastYearToDisplay - currentYear + 1;
+
   const chartData = Array.from({ length: yearsToProject }, (_, i) => {
     const year = currentYear + i;
     const x = i;
@@ -291,7 +293,7 @@ const RetirementProjectionComponent: React.FC = () => {
     };
   }, [roundedMax]);
 
-      /* ────────────────────────────── 1. constants ────────────────────────────── */
+  /* ────────────────────────────── 1. constants ────────────────────────────── */
   const currentYear        = 2025;
   const lastYearToDisplay  = 2080;                 // hard cap for chart & axis
   
@@ -343,8 +345,8 @@ const RetirementProjectionComponent: React.FC = () => {
                 />
                 <XAxis
                   dataKey="year"
-                  type="number"                                 /* NEW */
-                  domain={[currentYear, lastYearToDisplay]}     /* NEW */
+                  type="number"                                // needed so ‘domain’ is honoured
+                  domain={[currentYear, lastYearToDisplay]}    // ⇢ compresses scale to 2080
                   ticks={xAxisTicks}
                   tick={{ fontSize: 10 }}
                   tickLine={false}
