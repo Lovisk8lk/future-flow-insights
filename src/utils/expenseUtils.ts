@@ -22,6 +22,7 @@ export const fetchExpensesByUserId = async (userId: string) => {
     return [];
   }
 
+  console.log(data);
   return data as ExpenseTransaction[];
 };
 
