@@ -69,7 +69,7 @@ Monthly Data:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-2024-11-20',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'You are a helpful financial assistant that provides concise, personalized financial insights.' },
           { role: 'user', content: prompt }
