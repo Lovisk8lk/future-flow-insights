@@ -16,7 +16,7 @@ serve(async (req) => {
   }
 
   try {
-    const { monthData, previousMonth } = await req.json();
+    const { monthData, previousMonth, transactions } = await req.json();
     
     // Create a meaningful prompt based on the expense data
     let prompt = `Analyze the following monthly expense data and provide a concise, personalized financial summary (about 2-3 sentences):
@@ -38,6 +38,17 @@ Monthly Data:
     if (previousMonth) {
       const change = ((monthData.totalAmount - previousMonth.totalAmount) / previousMonth.totalAmount) * 100;
       prompt += `\nMonth-over-month total expense change: ${change.toFixed(1)}% (previous month: €${previousMonth.totalAmount.toFixed(0)})`;
+    }
+
+    // Add transaction details if available
+    if (transactions && transactions.length > 0) {
+      prompt += `\n\nRecent Transactions (up to 5):`;
+      transactions.slice(0, 5).forEach((transaction, index) => {
+        const amount = Math.abs(transaction.amount || 0);
+        const date = transaction.bookingDate ? new Date(transaction.bookingDate).toLocaleDateString() : 'Unknown date';
+        const description = transaction.transactionDescription || 'No description';
+        prompt += `\n${index + 1}. ${date}: €${amount.toFixed(2)} - ${description}`;
+      });
     }
 
     prompt += `\n\nProvide a short, insightful analysis of spending patterns, highlight any significant changes between months, and suggest one simple actionable tip for better financial management.

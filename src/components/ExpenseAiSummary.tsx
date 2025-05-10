@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
 type MonthCategorySummary = {
   month: string;
   monthKey: string;
@@ -13,24 +15,72 @@ type MonthCategorySummary = {
     transactions: any[];
   }[];
 };
+
 interface ExpenseAiSummaryProps {
   data: MonthCategorySummary;
   previousMonth: MonthCategorySummary | null;
   aiSummary: string | null;
   isLoading: boolean;
+  transactions?: any[];
 }
+
 const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
   data,
   previousMonth,
   aiSummary,
-  isLoading
+  isLoading,
+  transactions = []
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [localAiSummary, setLocalAiSummary] = useState<string | null>(aiSummary);
+  const [localIsLoading, setLocalIsLoading] = useState<boolean>(isLoading);
+
+  // Update AI summary when data changes
+  useEffect(() => {
+    const updateAiSummary = async () => {
+      // Skip if we don't have real data yet or if we're already loading
+      if (data.month === 'Current Month' || localIsLoading) return;
+      
+      setLocalIsLoading(true);
+      try {
+        // Call our Supabase Edge Function with the latest data
+        const { data: result, error: functionError } = await supabase.functions.invoke('generate-ai-summary', {
+          body: {
+            monthData: data,
+            previousMonth,
+            transactions
+          }
+        });
+        
+        if (functionError) {
+          throw new Error('Failed to fetch AI summary: ' + functionError.message);
+        }
+        
+        // Update with the new AI summary
+        if (result.generatedText) {
+          setLocalAiSummary(result.generatedText);
+          // Update session storage
+          sessionStorage.setItem('aiSummary', result.generatedText);
+        }
+      } catch (err) {
+        console.error('Error updating AI summary:', err);
+        // Keep using the existing summary, don't show an error
+      } finally {
+        setLocalIsLoading(false);
+      }
+    };
+    
+    // Only update if we have real data and it has changed
+    if (data.month !== 'Current Month' && data.totalAmount > 0) {
+      updateAiSummary();
+    }
+  }, [data.month, data.totalAmount, previousMonth, transactions]);
 
   // Fallback text to use when AI generation fails
   const fallbackText = `Excellent expense management! Your spending this month shows consistent discipline in major categories.
     ${previousMonth && data.totalAmount < previousMonth.totalAmount ? " You've reduced your overall expenses compared to last month, showing good financial discipline." : ""}
     ${data.categories.length > 0 ? ` Your biggest expense category is ${data.categories[0].category}, representing ${(data.categories[0].totalAmount / data.totalAmount * 100).toFixed(0)}% of your total spending.` : ""}`;
+
   return <>
       <Card className="bg-finance-gray rounded-xl overflow-hidden" id="expense-intelligence-card">
         <div className="flex items-center gap-3 p-4 border-b border-gray-200">
@@ -42,8 +92,8 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
           <h3 className="text-lg font-semibold">Expense Intelligence</h3>
         </div>
         <CardContent className="p-4">
-          {isLoading ? <p className="text-sm font-medium mb-4">Loading AI insights...</p> : <p className="text-sm font-medium mb-4">
-              {aiSummary || fallbackText}
+          {localIsLoading ? <p className="text-sm font-medium mb-4">Loading AI insights...</p> : <p className="text-sm font-medium mb-4">
+              {localAiSummary || fallbackText}
             </p>}
           <button onClick={() => setIsDialogOpen(true)} className="w-full bg-black text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 transition-colors">
             Refine Budget
@@ -94,4 +144,5 @@ const TradeRepublicAiIcon = () => <svg width="24" height="24" viewBox="0 0 24 24
     <path d="M4 8H20M4 16H20" stroke="white" strokeWidth="3" strokeLinecap="round" />
     <path d="M7 12H17" stroke="white" strokeWidth="3" strokeLinecap="round" />
   </svg>;
+
 export default ExpenseAiSummary;
