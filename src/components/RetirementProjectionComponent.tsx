@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
@@ -85,7 +86,6 @@ const RetirementProjectionComponent: React.FC = () => {
   };
 
   // Calculate the projection data based on the formulas
-  // Calculate the projection data based on the formulas
   const currentYear = 2025;
 
   // --- hard-cap the X-axis at 2080 and derive yearsToProject from it ---
@@ -98,101 +98,68 @@ const RetirementProjectionComponent: React.FC = () => {
   // Prepare data for chart
   const rentStartIndex = R_RentPayoutStart - currentYear;
   
-  // Include initialCapital in the calculation
-  let g_at_retirement = initialCapital; // Start with initial capital
+  // Store the wealth value at retirement
+  let wealthAtRetirement = 0;
   
-  if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
-    g_at_retirement += P_Deposit * 12 * rentStartIndex * Math.pow(1 + i_payIn/100, rentStartIndex - 1);
-  } else {
-    g_at_retirement += P_Deposit * 12 * (
-      (Math.pow(1 + i_payIn/100, rentStartIndex) - Math.pow(1 + r_MrktRate/100, rentStartIndex)) /
-      (i_payIn/100 - r_MrktRate/100)
-    );
-  }
-  
-  const numerator = i_PayoutIncrease/100 - r_MrktRate/100;
-  const denominator = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1;
-  const C_growth = Math.abs(denominator) < 0.0001 ? g_at_retirement : g_at_retirement * numerator / denominator;
-  
-  // Calculate inflation-adjusted interest rate
-  const inflationAdjustedInterest = (() => {
-    // Formula: g(R_RentPayoutStart) * (((1+i_PayoutIncrease)/(1+r_MrktRate))^N_RentDuration - 1)/(i_PayoutIncrease-r_MrktRate)
-    
-    // Check for division by zero
-    if (Math.abs(i_PayoutIncrease - r_MrktRate) < 0.0001) {
-      return g_at_retirement * N_RentDuration;
-    }
-    
-    const adjustedNumerator = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1;
-    const adjustedDenominator = i_PayoutIncrease/100 - r_MrktRate/100;
-    
-    return g_at_retirement * (adjustedNumerator / adjustedDenominator);
-  })();
-
-  // Calculate monthly pension amount (divide annual amount by 12)
-  const monthlyPension = inflationAdjustedInterest / (N_RentDuration * 12)*1/12;
-
-  // Get first expense category amount for the message
-  const firstExpenseAmount = expenses.categories.length > 0 ? expenses.categories[0].amount : 0;
-  
-  // Calculate potential wealth increase (simple estimate - 10% of first expense saved over years until retirement)
-  const potentialMonthlySavings = Math.round(firstExpenseAmount * 0.1);
-  const potentialIncrease = Math.round(potentialMonthlySavings * 12 * (R_RentPayoutStart - currentYear) * (1 + r_MrktRate/100));
-
-  // Format currency for display
-  const formatCurrency = (value: number) => {
-    if (value >= 1000000) {
-      return `€${(value / 1000000).toFixed(2)}M`;
-    } else if (value >= 1000) {
-      return `€${(value / 1000).toFixed(1)}k`;
-    }
-    return `€${value.toFixed(2)}`;
-  };
-
-  // Handle click on the expenses link
-  const handleExpensesLinkClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setActiveTab("expenses");
-  };
-
-  // Prepare data for chart
+  // Prepare data for chart with initialCapital as starting point
   const chartData = Array.from({ length: yearsToProject }, (_, i) => {
     const year = currentYear + i;
     const x = i;
     
-    let f_value = null;
-    let g_value = null;
-    let h_value = null;
+    let f_value = null; // Invested Capital
+    let g_value = null; // Wealth
+    let h_value = null; // Remaining Pension
     
-    if (x >= 1 && year <= R_RentPayoutStart) {
-      f_value = P_Deposit * 12 * ((Math.pow(1 + i_payIn/100, x) - 1) / (i_payIn/100));
-    }
-  
-    if (x >= 1 && year <= R_RentPayoutStart) {
-      // Include initialCapital in g_value calculation
+    // For the very first year (current year), set the initial values to initialCapital
+    if (x === 0) {
+      f_value = initialCapital;
+      g_value = initialCapital;
+    } else if (year <= R_RentPayoutStart) {
+      // Invested Capital calculation - starts from initialCapital
+      f_value = initialCapital + P_Deposit * 12 * ((Math.pow(1 + i_payIn/100, x) - 1) / (i_payIn/100));
+      
+      // Wealth calculation - starts from initialCapital
       if (Math.abs(i_payIn/100 - r_MrktRate/100) < 0.0001) {
         g_value = initialCapital * Math.pow(1 + r_MrktRate/100, x) + 
-                  P_Deposit * 12 * x * Math.pow(1 + i_payIn/100, x - 1);
+                 P_Deposit * 12 * x * Math.pow(1 + i_payIn/100, x - 1);
       } else {
         g_value = initialCapital * Math.pow(1 + r_MrktRate/100, x) + 
-                  P_Deposit * 12 * (
-                    (Math.pow(1 + i_payIn/100, x) - Math.pow(1 + r_MrktRate/100, x)) / 
-                    (i_payIn/100 - r_MrktRate/100)
-                  );
+                 P_Deposit * 12 * (
+                   (Math.pow(1 + i_payIn/100, x) - Math.pow(1 + r_MrktRate/100, x)) / 
+                   (i_payIn/100 - r_MrktRate/100)
+                 );
+      }
+      
+      // Store the wealth value at retirement
+      if (year === R_RentPayoutStart) {
+        wealthAtRetirement = g_value;
       }
     }
-  
+    
+    // Calculate remaining pension value starting from the wealth at retirement
     if (x >= 1 && year >= R_RentPayoutStart && (year - R_RentPayoutStart) <= N_RentDuration) {
       const years_since_retirement = year - R_RentPayoutStart;
       const years_left = N_RentDuration - years_since_retirement;
-  
-      const factor1 = Math.pow(1 + i_PayoutIncrease/100, years_since_retirement);
-      const factor2 = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), years_left) - 1;
-  
-      if (Math.abs(i_PayoutIncrease/100 - r_MrktRate/100) < 0.0001 || Math.abs(factor2) < 0.0001) {
-        h_value = C_growth * (N_RentDuration - years_since_retirement);
+      
+      // Use the actual wealth value at retirement for pension calculations
+      if (years_since_retirement === 0) {
+        h_value = wealthAtRetirement;
       } else {
-        h_value = C_growth * factor1 * factor2 / (i_PayoutIncrease/100 - r_MrktRate/100);
+        const factor1 = Math.pow(1 + i_PayoutIncrease/100, years_since_retirement);
+        const factor2 = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), years_left) - 1;
+        
+        // Calculate C_growth based on wealthAtRetirement
+        const numerator = i_PayoutIncrease/100 - r_MrktRate/100;
+        const denominator = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1;
+        const C_growth = Math.abs(denominator) < 0.0001 ? 
+                         wealthAtRetirement : 
+                         wealthAtRetirement * numerator / denominator;
+        
+        if (Math.abs(i_PayoutIncrease/100 - r_MrktRate/100) < 0.0001 || Math.abs(factor2) < 0.0001) {
+          h_value = C_growth * (N_RentDuration - years_since_retirement);
+        } else {
+          h_value = C_growth * factor1 * factor2 / (i_PayoutIncrease/100 - r_MrktRate/100);
+        }
       }
     }
       
@@ -204,11 +171,43 @@ const RetirementProjectionComponent: React.FC = () => {
     };
   });
 
+  // Calculate monthly pension amount based on wealthAtRetirement
+  const inflationAdjustedInterest = (() => {
+    if (Math.abs(i_PayoutIncrease - r_MrktRate) < 0.0001) {
+      return wealthAtRetirement * N_RentDuration;
+    }
+    
+    const adjustedNumerator = Math.pow((1 + i_PayoutIncrease/100) / (1 + r_MrktRate/100), N_RentDuration) - 1;
+    const adjustedDenominator = i_PayoutIncrease/100 - r_MrktRate/100;
+    
+    return wealthAtRetirement * (adjustedNumerator / adjustedDenominator);
+  })();
+
+  // Calculate monthly pension amount (divide annual amount by 12)
+  const monthlyPension = inflationAdjustedInterest / (N_RentDuration * 12) * 1/12;
+
+  // Get first expense category amount for the message
+  const firstExpenseAmount = expenses.categories.length > 0 ? expenses.categories[0].amount : 0;
+  
+  // Calculate potential wealth increase (simple estimate - 10% of first expense saved over years until retirement)
+  const potentialMonthlySavings = Math.round(firstExpenseAmount * 0.1);
+  const potentialIncrease = Math.round(potentialMonthlySavings * 12 * (R_RentPayoutStart - currentYear) * (1 + r_MrktRate/100));
+
   // Find max value for Y-axis
   const values = chartData.flatMap(d => [d.f, d.g, d.h]);
   const maxValue = Math.max(...values.filter(v => !isNaN(v) && isFinite(v)));
   const roundedMax = Math.ceil(maxValue / 1000) * 1000;
-  
+
+  // Format currency for display
+  const formatCurrency = (value: number) => {
+    if (value >= 1000000) {
+      return `€${(value / 1000000).toFixed(2)}M`;
+    } else if (value >= 1000) {
+      return `€${(value / 1000).toFixed(1)}k`;
+    }
+    return `€${value.toFixed(2)}`;
+  };
+
   // Y-axis animation logic with delay
   useEffect(() => {
     if (!previousMaxRef.current) {
@@ -310,6 +309,12 @@ const RetirementProjectionComponent: React.FC = () => {
       return `${(value / 1000000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`;
     }
     return `${(value / 1000).toLocaleString()}k`;
+  };
+
+  // Handle click on the expenses link
+  const handleExpensesLinkClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setActiveTab("expenses");
   };
 
   // Chart configuration for the colors and labels
