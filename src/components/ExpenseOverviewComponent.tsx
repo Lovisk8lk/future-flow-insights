@@ -143,7 +143,7 @@ const ExpenseOverviewComponent: React.FC = () => {
                   <div className="text-right">
                   {previousMonth && <span className={`text-lg ${getChangeColor(parseFloat(calculateTotalChange() || "0"))}`}>
                       {parseFloat(calculateTotalChange() || "0") > 0 ? "+" : ""}
-                      {calculateTotalChange()}% vs prev month
+                      {calculateTotalChange()}% MoM
                     </span>}
                   </div>
                 </div>
