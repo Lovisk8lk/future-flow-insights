@@ -191,10 +191,10 @@ const RetirementProjectionComponent: React.FC = () => {
               <Line 
                 type="monotone" 
                 dataKey="g" 
-                stroke="#489065" 
+                stroke="##2cde76" 
                 strokeWidth={2}
                 dot={false} 
-                activeDot={{ r: 6, fill: "#00FF00", stroke: "#fff" }} 
+                activeDot={{ r: 6, fill: "##2cde76", stroke: "#fff" }} 
                 name="g"
               />
               <Line 
