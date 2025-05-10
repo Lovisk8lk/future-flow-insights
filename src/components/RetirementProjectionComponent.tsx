@@ -454,7 +454,7 @@ const RetirementProjectionComponent: React.FC = () => {
             <div>
               <h4 className="text-sm font-medium text-black mb-1">Boost your retirement</h4>
               <p className="text-xs text-gray-600">
-                Save <span className="font-medium">{firstExpenseAmount > 0 ? formatCurrency(potentialMonthlySavings) : '€50'}</span> monthly from expenses to gain <span className="font-medium">{formatCurrency(potentialIncrease)}</span>
+                Save <span className="font-medium">€21.98</span> monthly from expenses to gain <span className="font-medium">€50k</span>
               </p>
             </div>
           </div>
