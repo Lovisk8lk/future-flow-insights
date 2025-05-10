@@ -214,11 +214,10 @@ const RetirementProjectionComponent: React.FC = () => {
       previousMaxRef.current = roundedMax;
       setYAxisAnimatedMax(roundedMax);
       setYAxisTicks([
-        Math.round(extendedMax / 4),
-        Math.round(extendedMax / 2),
-        Math.round(extendedMax * 3 / 4),
-        Math.round(roundedMax),
-        Math.round(extendedMax)               // top tick = new axis top
+        Math.round(roundedMax / 4),
+        Math.round(roundedMax / 2),
+        Math.round(roundedMax * 3 / 4),
+        Math.round(roundedMax)               // top tick = new axis top
       ]);
       return;
     }
@@ -351,6 +350,7 @@ const RetirementProjectionComponent: React.FC = () => {
                   tickLine={false}
                   axisLine={false}
                   orientation="right"
+                  /** ⬇️  old: domain={[0, yAxisAnimatedMax || roundedMax]} */
                   domain={[0, (yAxisAnimatedMax || roundedMax) * 1.1]}
                   allowDataOverflow
                 />
