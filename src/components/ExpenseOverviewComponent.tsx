@@ -74,6 +74,7 @@ const ExpenseOverviewComponent: React.FC = () => {
   useEffect(() => {
     // Find the previous month data for comparison
     if (selectedMonth && monthCategoryGroups.length > 1) {
+      // Find the index of the selected month in the array
       const currentMonthIndex = monthCategoryGroups.findIndex(group => {
         const [year, month] = selectedMonth.split('-');
         const monthYearString = new Date(parseInt(year), parseInt(month) - 1, 1)
@@ -81,7 +82,9 @@ const ExpenseOverviewComponent: React.FC = () => {
         return group.month === monthYearString;
       });
       
-      if (currentMonthIndex >= 0 && currentMonthIndex < monthCategoryGroups.length - 1) {
+      // Get the next index (which is the previous month chronologically)
+      // since monthCategoryGroups is sorted most recent first
+      if (currentMonthIndex >= 0 && currentMonthIndex + 1 < monthCategoryGroups.length) {
         setPreviousMonth(monthCategoryGroups[currentMonthIndex + 1]);
       } else {
         setPreviousMonth(null);
@@ -166,7 +169,7 @@ const ExpenseOverviewComponent: React.FC = () => {
                   {previousMonth && (
                     <span className={`text-xl ${getChangeColor(parseFloat(calculateTotalChange() || "0"))}`}>
                       {parseFloat(calculateTotalChange() || "0") > 0 ? "+" : ""}
-                      {calculateTotalChange()}% vs last month
+                      {calculateTotalChange()}% vs prev month
                     </span>
                   )}
                 </div>
