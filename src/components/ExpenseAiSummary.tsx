@@ -44,11 +44,13 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
   const subscriptions: Subscription[] = [{
     name: "Netflix Standard Plan",
     price: "€11.99",
-    id: "netflix"
+    id: "netflix",
+    savings: "€30k"
   }, {
     name: "Amazon Prime Subscription",
     price: "€9.99",
-    id: "amazon-prime"
+    id: "amazon-prime",
+    savings: "€25k"
   }];
 
   // Cache key to identify unique data combinations
@@ -193,22 +195,22 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-finance-gray border-none max-w-[350px] min-h-[300px] p-3">
+        <DialogContent className="bg-finance-gray border-none max-w-[350px] p-3">
           <DialogHeader className="pb-1">
             <DialogTitle className="text-xl">Refine Your Budget</DialogTitle>
           </DialogHeader>
           <div className="py-0">
-            <p className="text-sm text-gray-700 mb-2 my-[10px]">
+            <p className="text-sm text-gray-700 mt-1 mb-2">
               Adjust your monthly budget targets based on AI recommendations or cancel subscriptions.
             </p>
-            <div className="space-y-1 py-0">
+            <div className="space-y-3 py-0">
               {/* Subscription Cards */}
               {subscriptions.map(subscription => <div key={subscription.id} className={`bg-white p-3 rounded-lg cursor-pointer transition-colors ${selectedSubscription === subscription.id ? 'ring-2 ring-black' : 'hover:bg-gray-50'}`} onClick={() => handleSubscriptionSelect(subscription.id)}>
                   <div className="flex justify-between items-center">
                     <h4 className="font-medium text-base">{subscription.name}</h4>
                     <p className="text-sm font-medium">{subscription.price}</p>
                   </div>
-                  <p className="text-xs text-green-600 font-semibold">Worth €30k at Retirement</p>
+                  <p className="text-xs text-green-600 font-semibold">Worth {subscription.savings} at Retirement</p>
                 </div>)}
               
               {/* Authorization Checkbox */}
@@ -220,7 +222,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
               </div>
               
               {/* Cancel Button */}
-              <Button onClick={handleCancel} disabled={!selectedSubscription || !authorized || isCancelling} className="w-full mt-4 bg-black hover:bg-gray-800">
+              <Button onClick={handleCancel} disabled={!selectedSubscription || !authorized || isCancelling} className="w-full mt-4 bg-black hover:bg-gray-800 my-0">
                 {isCancelling ? "Cancelling..." : "Cancel Subscription"}
               </Button>
             </div>
