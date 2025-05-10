@@ -194,7 +194,7 @@ const RetirementProjectionComponent: React.FC = () => {
                 stroke="##2cde76" 
                 strokeWidth={2}
                 dot={false} 
-                activeDot={{ r: 6, fill: "##2cde76", stroke: "#fff" }} 
+                activeDot={{ r: 6, fill: "#2cde76", stroke: "#fff" }} 
                 name="g"
               />
               <Line 
