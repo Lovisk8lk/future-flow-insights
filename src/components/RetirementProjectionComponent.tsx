@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
@@ -26,7 +25,6 @@ const RetirementProjectionComponent: React.FC = () => {
   // Animation properties - increased from 800ms to 1800ms for slower animation
   const animationDuration = 1800; // milliseconds
   const animationStartTimeRef = useRef<number | null>(null);
-  const animationDelayMs = 2000; // 2-second delay before animation starts
   
   useEffect(() => {
     // Ensure retirementDuration is set if it doesn't exist
@@ -151,57 +149,51 @@ const RetirementProjectionComponent: React.FC = () => {
     if (roundedMax !== previousMaxRef.current) {
       const startValue = previousMaxRef.current;
       const targetValue = roundedMax;
-      
+      const startTime = performance.now();
+      animationStartTimeRef.current = startTime;
+
       // Cancel any running animation
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
 
-      // Start a new animation with a delay
-      const startAnimation = () => {
-        const startTime = performance.now();
-        animationStartTimeRef.current = startTime;
-
-        // Easing function for smooth animation
-        const easeOutCubic = (t: number): number => {
-          return 1 - Math.pow(1 - t, 3);
-        };
-
-        // Animation loop
-        const animateYAxis = (timestamp: number) => {
-          if (!animationStartTimeRef.current) return;
-          
-          const elapsed = timestamp - animationStartTimeRef.current;
-          const progress = Math.min(elapsed / animationDuration, 1);
-          const easedProgress = easeOutCubic(progress);
-          
-          // Interpolate between start and target values
-          const currentMax = startValue + (targetValue - startValue) * easedProgress;
-          setYAxisAnimatedMax(currentMax);
-          
-          // Update ticks with animated values
-          setYAxisTicks([
-            Math.round(currentMax / 4),
-            Math.round(currentMax / 2),
-            Math.round(currentMax * 3 / 4),
-            Math.round(currentMax)
-          ]);
-          
-          if (progress < 1) {
-            animationFrameRef.current = requestAnimationFrame(animateYAxis);
-          } else {
-            // Animation complete, update the previous max value
-            previousMaxRef.current = targetValue;
-            animationStartTimeRef.current = null;
-            animationFrameRef.current = null;
-          }
-        };
-        
-        animationFrameRef.current = requestAnimationFrame(animateYAxis);
+      // Easing function for smooth animation
+      const easeOutCubic = (t: number): number => {
+        return 1 - Math.pow(1 - t, 3);
       };
 
-      // Apply the delay before starting animation
-      setTimeout(startAnimation, animationDelayMs);
+      // Animation loop
+      const animateYAxis = (timestamp: number) => {
+        if (!animationStartTimeRef.current) return;
+        
+        const elapsed = timestamp - animationStartTimeRef.current;
+        const progress = Math.min(elapsed / animationDuration, 1);
+        const easedProgress = easeOutCubic(progress);
+        
+        // Interpolate between start and target values
+        const currentMax = startValue + (targetValue - startValue) * easedProgress;
+        setYAxisAnimatedMax(currentMax);
+        
+        // Update ticks with animated values
+        setYAxisTicks([
+          Math.round(currentMax / 4),
+          Math.round(currentMax / 2),
+          Math.round(currentMax * 3 / 4),
+          Math.round(currentMax)
+        ]);
+        
+        if (progress < 1) {
+          animationFrameRef.current = requestAnimationFrame(animateYAxis);
+        } else {
+          // Animation complete, update the previous max value
+          previousMaxRef.current = targetValue;
+          animationStartTimeRef.current = null;
+          animationFrameRef.current = null;
+        }
+      };
+      
+      // Start animation
+      animationFrameRef.current = requestAnimationFrame(animateYAxis);
     }
     
     // Cleanup animation on unmount
