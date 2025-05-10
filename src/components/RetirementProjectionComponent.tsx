@@ -438,7 +438,7 @@ const RetirementProjectionComponent: React.FC = () => {
       
       <div className="flex justify-center gap-8">
         {/* Monthly Deposit Input Field */}
-        <div className="space-y-2 w-32">
+        <div className="space-y-2 w-42">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Monthly Deposit</label>
           </div>
@@ -457,7 +457,7 @@ const RetirementProjectionComponent: React.FC = () => {
         </div>
         
         {/* Retirement Year Select */}
-        <div className="space-y-2 w-32">
+        <div className="space-y-2 w-42">
           <div className="flex justify-between">
             <label className="text-sm font-medium">Retirement Start Year</label>
           </div>
