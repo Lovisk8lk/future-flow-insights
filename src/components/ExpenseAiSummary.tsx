@@ -44,11 +44,13 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
   const subscriptions: Subscription[] = [{
     name: "Netflix Standard Plan",
     price: "€11.99",
-    id: "netflix"
+    id: "netflix",
+    savings: "€30k"
   }, {
     name: "Amazon Prime Subscription",
     price: "€9.99",
-    id: "amazon-prime"
+    id: "amazon-prime",
+    savings: "€25k"
   }];
 
   // Cache key to identify unique data combinations
@@ -208,7 +210,7 @@ const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({
                     <h4 className="font-medium text-base">{subscription.name}</h4>
                     <p className="text-sm font-medium">{subscription.price}</p>
                   </div>
-                  <p className="text-xs text-green-600 font-semibold">Worth €30k at Retirement</p>
+                  <p className="text-xs text-green-600 font-semibold">Worth {subscription.savings} at Retirement</p>
                 </div>)}
               
               {/* Authorization Checkbox */}
