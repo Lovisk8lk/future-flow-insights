@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
   Dialog, 
@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 type MonthCategorySummary = {
   month: string;
@@ -25,63 +24,12 @@ type MonthCategorySummary = {
 interface ExpenseAiSummaryProps {
   data: MonthCategorySummary;
   previousMonth: MonthCategorySummary | null;
+  aiSummary: string | null;
+  isLoading: boolean;
 }
 
-const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth }) => {
+const ExpenseAiSummary: React.FC<ExpenseAiSummaryProps> = ({ data, previousMonth, aiSummary, isLoading }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [aiSummary, setAiSummary] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  useEffect(() => {
-    const fetchAiSummary = async () => {
-      // Check if we already have a cached summary in the session
-      const cachedSummary = sessionStorage.getItem('aiSummary');
-      
-      if (cachedSummary) {
-        console.log("Using cached AI summary from session storage");
-        setAiSummary(cachedSummary);
-        return;
-      }
-      
-      setIsLoading(true);
-      setError(null);
-      try {
-        // Call our Supabase Edge Function
-        const { data: result, error: functionError } = await supabase.functions.invoke('generate-ai-summary', {
-          body: {
-            monthData: data,
-            previousMonth: previousMonth
-          }
-        });
-        
-        if (functionError) {
-          throw new Error('Failed to fetch AI summary: ' + functionError.message);
-        }
-        
-        // Cache the generated text in session storage
-        if (result.generatedText) {
-          sessionStorage.setItem('aiSummary', result.generatedText);
-        }
-        
-        setAiSummary(result.generatedText);
-      } catch (err) {
-        console.error('Error fetching AI summary:', err);
-        setError('Failed to load AI insights. Using fallback text.');
-        toast({
-          title: "AI Summary Failed",
-          description: "Using fallback text instead",
-          variant: "destructive",
-        });
-        // Fallback to the static text
-        setAiSummary(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchAiSummary();
-  }, []); // Only run once per session, not when month changes
   
   // Fallback text to use when AI generation fails
   const fallbackText = `Excellent expense management! Your spending this month shows consistent discipline in major categories.

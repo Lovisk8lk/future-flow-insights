@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useFinance } from "../contexts/FinanceContext";
 import { fetchExpensesByUserId, ExpenseTransaction, groupExpensesByMonthAndCategory, fetchAvailableMonths } from "../utils/expenseUtils";
@@ -5,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import ExpenseAiSummary from "./ExpenseAiSummary";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 type MonthOption = {
   year: number;
@@ -34,7 +37,58 @@ const ExpenseOverviewComponent: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [previousMonth, setPreviousMonth] = useState<MonthCategorySummary | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState<boolean>(false);
   const userId = "25e3564c-8bb9-4fdd-9dd7-cf0ec8c54c28";
+
+  // Preload AI summary as early as possible
+  useEffect(() => {
+    const preloadAiSummary = async () => {
+      // Check if we already have a cached summary in the session
+      const cachedSummary = sessionStorage.getItem('aiSummary');
+      
+      if (cachedSummary) {
+        console.log("Using cached AI summary from session storage");
+        setAiSummary(cachedSummary);
+        setAiLoading(false);
+        return;
+      }
+      
+      setAiLoading(true);
+      try {
+        // Call our Supabase Edge Function
+        const { data: result, error: functionError } = await supabase.functions.invoke('generate-ai-summary', {
+          body: {
+            monthData: { month: "Current Month", totalAmount: 0, categories: [] },
+            previousMonth: null
+          }
+        });
+        
+        if (functionError) {
+          throw new Error('Failed to fetch AI summary: ' + functionError.message);
+        }
+        
+        // Cache the generated text in session storage
+        if (result.generatedText) {
+          sessionStorage.setItem('aiSummary', result.generatedText);
+          setAiSummary(result.generatedText);
+        }
+      } catch (err) {
+        console.error('Error preloading AI summary:', err);
+        toast({
+          title: "AI Summary Failed",
+          description: "Using fallback text instead",
+          variant: "destructive",
+        });
+        setAiSummary(null);
+      } finally {
+        setAiLoading(false);
+      }
+    };
+    
+    // Start preloading immediately
+    preloadAiSummary();
+  }, []);
 
   useEffect(() => {
     const loadExpenses = async () => {
@@ -155,8 +209,13 @@ const ExpenseOverviewComponent: React.FC = () => {
                   </div>
                 </div>
                 
-                {/* Add AI Summary component here */}
-                <ExpenseAiSummary data={filteredMonthData} previousMonth={previousMonth} />
+                {/* Add AI Summary component with preloaded data */}
+                <ExpenseAiSummary 
+                  data={filteredMonthData} 
+                  previousMonth={previousMonth}
+                  aiSummary={aiSummary}
+                  isLoading={aiLoading}
+                />
                 
                 <Card className="overflow-hidden mt-6">
                   {filteredMonthData.categories.map((category, index) => {
