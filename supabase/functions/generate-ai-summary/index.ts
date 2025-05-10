@@ -22,12 +22,14 @@ serve(async (req) => {
     // Create a meaningful prompt based on the expense data
     let prompt = `Analyze the attached customer transaction data to pinpoint under-used, duplicative, or low-value subscriptions that could be cancelled with minimal lifestyle impact—but do not display those findings.
 
+If the user has multiple subscriptions within the same service category (e.g., two entertainment platforms), identify this overlap and suggest canceling one of them, based on usage or perceived redundancy. Emphasize that maintaining multiple similar services may offer limited added value, and one can likely meet their needs.
+
 Output:
 A single, concise, upbeat in-app message that:
-
-1. Encourages the user by highlighting a positive recent spending habit (no numbers).
-2. Drives action by naming one specific low-value subscription to cancel and hinting at its long-term benefit -> they are named in the data
-3. Point out alternatives like similar services in the same domain that the user haves, or research alternative cheaper alternatives like specific public transport tickets in the city of the user for non-digital tools.
+	1.	Encourages the user by highlighting a positive recent spending habit (no numbers).
+	2.	Drives action by naming one specific low-value or duplicative subscription to cancel and hinting at its long-term benefit.
+	3.	Clearly points out when the user subscribes to multiple services in the same category and suggests streamlining to reduce unnecessary spend.
+	4.	Optionally recommends alternatives—other services the user already uses or cost-effective non-digital tools relevant to their city (e.g., transport passes).
 
 Tone: Friendly, empowering, action-oriented, and urgent—celebrate progress and spotlight opportunity.
 
