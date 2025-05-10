@@ -169,44 +169,28 @@ const RetirementProjectionComponent: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col px-2 py-2">
-      <div style={{ height: "400px", width: "100%", maxWidth: "100%" }}>
+    <div className="flex flex-col px-5 py-4">
+      <div style={{ height: "600px", marginBottom: "0" }}>
         <ChartContainer config={chartConfig} style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+            <LineChart data={chartData} margin={{ top: 10, right: 30, left: 5, bottom: 10 }}>
               <CartesianGrid horizontal vertical={false} stroke="#f0f0f0" strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="year" 
-                tick={{ fontSize: 9 }} 
-                ticks={xAxisTicks} 
-                tickLine={false} 
-                axisLine={false}
-                height={20}
-              />
-              <YAxis 
-                tick={{ fontSize: 9 }} 
-                ticks={yAxisTicks} 
-                tickFormatter={formatYAxis} 
-                tickLine={false} 
-                axisLine={false} 
-                orientation="right" 
-                domain={[0, roundedMax]}
-                width={40}
-              />
+              <XAxis dataKey="year" tick={{ fontSize: 10 }} ticks={xAxisTicks} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 10 }} ticks={yAxisTicks} tickFormatter={formatYAxis} tickLine={false} axisLine={false} orientation="right" domain={[0, roundedMax]} />
               <Tooltip content={<ChartTooltipContent />} />
-              <Line type="monotone" dataKey="f" stroke="#132676" strokeWidth={2} dot={false} activeDot={{ r: 5, fill: "#132676", stroke: "#fff" }} name="f" />
-              <Line type="monotone" dataKey="g" stroke="#2cde76" strokeWidth={2} dot={false} activeDot={{ r: 5, fill: "#2cde76", stroke: "#fff" }} name="g" />
-              <Line type="monotone" dataKey="h" stroke="#727272" strokeWidth={2} dot={false} activeDot={{ r: 5, fill: "#727272", stroke: "#fff" }} name="h" />
-              <ReferenceLine x={retirementPosition} stroke="#444444" strokeDasharray="3 3" label={{ value: 'Retirement', position: 'insideTopRight', style: { fontSize: 9 } }} />
+              <Line type="monotone" dataKey="f" stroke="#132676" strokeWidth={3} dot={false} activeDot={{ r: 6, fill: "#132676", stroke: "#fff" }} name="f" />
+              <Line type="monotone" dataKey="g" stroke="#2cde76" strokeWidth={3} dot={false} activeDot={{ r: 6, fill: "#2cde76", stroke: "#fff" }} name="g" />
+              <Line type="monotone" dataKey="h" stroke="#727272" strokeWidth={3} dot={false} activeDot={{ r: 6, fill: "#727272", stroke: "#fff" }} name="h" />
+              <ReferenceLine x={retirementPosition} stroke="#444444" strokeDasharray="3 3" label={{ value: 'Retirement', position: 'insideTopRight', style: { fontSize: 10 } }} />
             </LineChart>
           </ResponsiveContainer>
         </ChartContainer>
       </div>
 
-      <div className="space-y-4 mt-4 px-2">
+      <div className="space-y-6 mt-6">
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Monthly Deposit: €{P_Deposit}</label>
+            <label className="text-sm font-medium">Monthly Deposit (P_Deposit): €{P_Deposit}</label>
           </div>
           <Slider 
             defaultValue={[P_Deposit]} 
@@ -220,7 +204,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Deposit Growth: {i_payIn}%</label>
+            <label className="text-sm font-medium">Deposit Growth Rate (i_payIn): {i_payIn}%</label>
           </div>
           <Slider 
             defaultValue={[i_payIn]} 
@@ -234,7 +218,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Market Rate: {r_MrktRate}%</label>
+            <label className="text-sm font-medium">Market Rate (r_MrktRate): {r_MrktRate}%</label>
           </div>
           <Slider 
             defaultValue={[r_MrktRate]} 
@@ -248,7 +232,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Payout Increase: {i_PayoutIncrease}%</label>
+            <label className="text-sm font-medium">Payout Increase Rate (i_PayoutIncrease): {i_PayoutIncrease}%</label>
           </div>
           <Slider 
             defaultValue={[i_PayoutIncrease]} 
@@ -262,7 +246,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Retirement: {retirementPosition}</label>
+            <label className="text-sm font-medium">Retirement Year: {retirementPosition} (Fixed at 75% of timeline)</label>
           </div>
           <Slider 
             defaultValue={[40]} 
@@ -277,7 +261,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
         <div className="space-y-2">
           <div className="flex justify-between">
-            <label className="text-sm font-medium">Duration: {N_RentDuration} years</label>
+            <label className="text-sm font-medium">Retirement Duration (N_RentDuration): {N_RentDuration} years</label>
           </div>
           <Slider 
             defaultValue={[N_RentDuration]} 
