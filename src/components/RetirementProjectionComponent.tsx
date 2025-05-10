@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label } from "recharts";
 import { useFinance } from "../contexts/FinanceContext";
@@ -205,7 +204,6 @@ const RetirementProjectionComponent: React.FC = () => {
   const values = chartData.flatMap(d => [d.f, d.g, d.h]);
   const maxValue = Math.max(...values.filter(v => !isNaN(v) && isFinite(v)));
   const roundedMax = Math.ceil(maxValue / 1000) * 1000;
-  const extendedMax = roundedMax * 1.1;    // 10 % over the real max
   
   // Y-axis animation logic with delay
   useEffect(() => {
@@ -214,11 +212,10 @@ const RetirementProjectionComponent: React.FC = () => {
       previousMaxRef.current = roundedMax;
       setYAxisAnimatedMax(roundedMax);
       setYAxisTicks([
-        Math.round(extendedMax / 4),
-        Math.round(extendedMax / 2),
-        Math.round(extendedMax * 3 / 4),
-        Math.round(roundedMax),
-        Math.round(extendedMax) // top tick = new axis top
+        Math.round(roundedMax / 4),
+        Math.round(roundedMax / 2),
+        Math.round(roundedMax * 3 / 4),
+        roundedMax
       ]);
       return;
     }
@@ -254,18 +251,16 @@ const RetirementProjectionComponent: React.FC = () => {
           const progress = Math.min(elapsed / animationDuration, 1);
           const easedProgress = easeOutCubic(progress);
           
+          // Interpolate between start and target values
+          const currentMax = startValue + (targetValue - startValue) * easedProgress;
+          setYAxisAnimatedMax(currentMax);
           
-          // inside animateYAxis()
-          const currentCoreMax = startValue + (targetValue - startValue) * easedProgress;
-          const extended = Math.round(currentCoreMax * 1.1);
-          
-          setYAxisAnimatedMax(currentCoreMax);
+          // Update ticks with animated values
           setYAxisTicks([
-            Math.round(currentCoreMax / 4),
-            Math.round(currentCoreMax / 2),
-            Math.round(currentCoreMax * 3 / 4),
-            Math.round(currentCoreMax),              // labelled (animates)
-            extended                                 // unlabeled
+            Math.round(currentMax / 4),
+            Math.round(currentMax / 2),
+            Math.round(currentMax * 3 / 4),
+            Math.round(currentMax * 1.1)
           ]);
           
           if (progress < 1) {
@@ -298,7 +293,7 @@ const RetirementProjectionComponent: React.FC = () => {
 
   // Create X-axis ticks for decades only (2030, 2040, etc.)
   const startYear = currentYear;
-  const xAxisTicks = Array.from({ length: 7}, (_, i) => 
+  const xAxisTicks = Array.from({ length: 6}, (_, i) => 
     startYear + i * 10 - ((startYear + i * 10) % 10)
   );
 
@@ -346,22 +341,15 @@ const RetirementProjectionComponent: React.FC = () => {
                   tickLine={false}
                   axisLine={false}
                 />
-                <YAxis
+                <YAxis 
                   tick={{ fontSize: 10 }}
                   ticks={yAxisTicks}
-                  /* 👇 hide label for the *very top* tick */
-                  tickFormatter={(v) => {
-                    // if this is the extendedMax tick: suppress label
-                    const top = Math.round((yAxisAnimatedMax || roundedMax) * 1.1);
-                    if (Math.abs(v - top) < 1) return "";
-                    // otherwise use your normal formatter
-                    return formatYAxis(v);
-                  }}
+                  tickFormatter={formatYAxis}
                   tickLine={false}
                   axisLine={false}
                   orientation="right"
-                  domain={[0, (yAxisAnimatedMax || roundedMax) * 1.1]}
-                  allowDataOverflow
+                  domain={[0, yAxisAnimatedMax || roundedMax]}
+                  allowDataOverflow={true}
                 />
                 <Tooltip content={<ChartTooltipContent />} />
                 <Line 
