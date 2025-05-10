@@ -25,7 +25,7 @@ Output:
 A single, concise, upbeat in-app message that:
 
 1. Encourages the user by highlighting a positive recent spending habit (no numbers).
-2. Drives action by naming one specific low-value subscription to cancel and hinting at its long-term benefit (e.g. “Canceling [Service] could free up €X/month NOW to grow into €Y in Z years!”).
+2. Drives action by naming one specific low-value subscription to cancel and hinting at its long-term benefit (e.g., Netflix, Amazon Prime, Spotify) -> they are named in the data
 
 Tone: Friendly, empowering, action-oriented, and urgent—celebrate progress and spotlight opportunity.
 
@@ -59,8 +59,7 @@ Monthly Data:
       });
     }
 
-    prompt += `\n\nProvide a short, insightful analysis of spending patterns, highlight any significant changes between months, and suggest one simple actionable tip for better financial management.
-Keep your response very concise - 2 to 3 sentences maximum. Use a friendly, professional tone. No introduction or greeting.`;
+    prompt += `\n\n1 to 2 sentences maximum. Use a friendly, professional tone. No introduction or greeting.`;
 
     // Log prompt for debugging
     console.log("Generated prompt with full context");
