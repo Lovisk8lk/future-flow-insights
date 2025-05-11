@@ -95,23 +95,33 @@ const ExpenseOverviewComponent: React.FC = () => {
   useEffect(() => {
     const loadExpenses = async () => {
       setLoading(true);
-      // Fetch all expenses for the demo user
-      const data = await fetchExpensesByUserId(userId);
-      setTransactions(data);
+      try {
+        // Fetch all expenses for the demo user
+        const data = await fetchExpensesByUserId(userId);
+        setTransactions(data);
 
-      // Fetch available months for filtering
-      const months = await fetchAvailableMonths(userId);
-      setAvailableMonths(months);
+        // Fetch available months for filtering
+        const months = await fetchAvailableMonths(userId);
+        setAvailableMonths(months);
 
-      // Set default month to most recent
-      if (months.length > 0) {
-        setSelectedMonth(months[0].value);
+        // Set default month to most recent
+        if (months.length > 0) {
+          setSelectedMonth(months[0].value);
+        }
+
+        // Group by Month and then by Category
+        const monthCategoryGrouped = groupExpensesByMonthAndCategory(data);
+        setMonthCategoryGroups(monthCategoryGrouped);
+      } catch (error) {
+        console.error("Error loading expense data:", error);
+        toast({
+          title: "Error loading expenses",
+          description: "Could not load expense data. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
       }
-
-      // Group by Month and then by Category
-      const monthCategoryGrouped = groupExpensesByMonthAndCategory(data);
-      setMonthCategoryGroups(monthCategoryGrouped);
-      setLoading(false);
     };
     loadExpenses();
   }, []);
