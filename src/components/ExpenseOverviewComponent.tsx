@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useFinance } from "../contexts/FinanceContext";
 import { fetchExpensesByUserId, ExpenseTransaction, groupExpensesByMonthAndCategory, fetchAvailableMonths } from "../utils/expenseUtils";
@@ -38,6 +39,7 @@ const ExpenseOverviewComponent: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState<boolean>(false);
+  // Use a hardcoded demo user ID for public access
   const userId = "9c9fdff3-26d0-485e-9e28-c98e967c8bdb";
 
   // Preload AI summary as early as possible
@@ -93,7 +95,7 @@ const ExpenseOverviewComponent: React.FC = () => {
   useEffect(() => {
     const loadExpenses = async () => {
       setLoading(true);
-      // Fetch all expenses for the user
+      // Fetch all expenses for the demo user
       const data = await fetchExpensesByUserId(userId);
       setTransactions(data);
 

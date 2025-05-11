@@ -23,13 +23,6 @@ const IndexContent = () => {
       console.log("Preloading AI summary at app startup");
       
       try {
-        // Check authentication before calling function
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          console.log("User not authenticated, skipping AI summary preload");
-          return;
-        }
-        
         // Fire and forget - we don't need to wait for the result
         supabase.functions.invoke('generate-ai-summary', {
           body: {
