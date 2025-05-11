@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export type ExpenseTransaction = {
@@ -10,19 +11,26 @@ export type ExpenseTransaction = {
   mcc: string;
 };
 
-export const fetchExpensesByUserId = async (userId: string) => {
+// Make sure this matches your database schema
+// Use the hardcoded demo user ID consistently
+const DEMO_USER_ID = "9c9fdff3-26d0-485e-9e28-c98e967c8bdb";
+
+export const fetchExpensesByUserId = async (userId: string = DEMO_USER_ID) => {
   try {
+    console.log("Fetching expenses for user:", userId);
+    
+    // Adjust query to fetch all transactions, not just CARD type
     const { data, error } = await supabase
       .from('banking_sample_data')
       .select('*')
-      .eq('userId', userId)
-      .eq('type', 'CARD');
+      .eq('userId', userId);
 
     if (error) {
       console.error("Error fetching expenses:", error);
       return [];
     }
 
+    console.log(`Fetched ${data?.length || 0} expenses`);
     return data as ExpenseTransaction[];
   } catch (error) {
     console.error("Exception fetching expenses:", error);
@@ -30,8 +38,10 @@ export const fetchExpensesByUserId = async (userId: string) => {
   }
 };
 
-export const fetchExpensesByMonth = async (userId: string, startDate: string, endDate: string) => {
+export const fetchExpensesByMonth = async (userId: string = DEMO_USER_ID, startDate: string, endDate: string) => {
   try {
+    console.log(`Fetching expenses between ${startDate} and ${endDate} for user ${userId}`);
+    
     const { data, error } = await supabase
       .from('banking_sample_data')
       .select('*')
@@ -45,6 +55,7 @@ export const fetchExpensesByMonth = async (userId: string, startDate: string, en
       return [];
     }
 
+    console.log(`Fetched ${data?.length || 0} expenses for the specified period`);
     return data as ExpenseTransaction[];
   } catch (error) {
     console.error("Exception fetching expenses by month:", error);
@@ -53,19 +64,22 @@ export const fetchExpensesByMonth = async (userId: string, startDate: string, en
 };
 
 // Get available months from the data
-export const fetchAvailableMonths = async (userId: string) => {
+export const fetchAvailableMonths = async (userId: string = DEMO_USER_ID) => {
   try {
+    console.log("Fetching available months for user:", userId);
+    
     const { data, error } = await supabase
       .from('banking_sample_data')
       .select('bookingDate')
-      .eq('userId', userId)
-      .order('bookingDate', { ascending: false });
+      .eq('userId', userId);
 
     if (error) {
       console.error("Error fetching available months:", error);
       return [];
     }
 
+    console.log(`Fetched ${data?.length || 0} booking dates for available months`);
+    
     // Extract unique months from the data
     const uniqueMonths = new Set();
     const months = [];
@@ -89,6 +103,7 @@ export const fetchAvailableMonths = async (userId: string) => {
       }
     });
 
+    console.log(`Generated ${months.length} unique months`);
     return months;
   } catch (error) {
     console.error("Exception fetching available months:", error);

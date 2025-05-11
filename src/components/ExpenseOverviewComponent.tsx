@@ -96,21 +96,27 @@ const ExpenseOverviewComponent: React.FC = () => {
     const loadExpenses = async () => {
       setLoading(true);
       try {
+        console.log("Starting to load expenses for user:", userId);
+        
         // Fetch all expenses for the demo user
         const data = await fetchExpensesByUserId(userId);
+        console.log(`Loaded ${data.length} total transactions`);
         setTransactions(data);
 
         // Fetch available months for filtering
         const months = await fetchAvailableMonths(userId);
+        console.log(`Loaded ${months.length} available months`);
         setAvailableMonths(months);
 
         // Set default month to most recent
         if (months.length > 0) {
+          console.log(`Setting default month to ${months[0].value}`);
           setSelectedMonth(months[0].value);
         }
 
         // Group by Month and then by Category
         const monthCategoryGrouped = groupExpensesByMonthAndCategory(data);
+        console.log(`Generated ${monthCategoryGrouped.length} month category groups`);
         setMonthCategoryGroups(monthCategoryGrouped);
       } catch (error) {
         console.error("Error loading expense data:", error);
