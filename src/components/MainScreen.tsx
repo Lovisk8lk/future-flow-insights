@@ -4,6 +4,7 @@ import { useFinance } from "../contexts/FinanceContext";
 import TabNavigation from "./TabNavigation";
 import RetirementProjectionComponent from "./RetirementProjectionComponent";
 import ExpenseOverviewComponent from "./ExpenseOverviewComponent";
+import AIChatComponent from "./AIChatComponent";
 
 const MainScreen: React.FC = () => {
   const { activeTab } = useFinance();
@@ -20,6 +21,8 @@ const MainScreen: React.FC = () => {
       <main className="flex-1 overflow-auto pb-20">
         {activeTab === "retirement" ? (
           <RetirementProjectionComponent />
+        ) : activeTab === "aichat" ? (
+          <AIChatComponent />
         ) : (
           <ExpenseOverviewComponent />
         )}

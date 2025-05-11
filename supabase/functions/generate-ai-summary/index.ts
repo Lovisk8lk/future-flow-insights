@@ -17,10 +17,22 @@ serve(async (req) => {
   }
 
   try {
-    const { monthData, previousMonth, transactions } = await req.json();
+    const { monthData, previousMonth, transactions, userQuestion } = await req.json();
+    
+    // If userQuestion is provided, we're in chat mode
+    const isChat = !!userQuestion;
     
     // Create a meaningful prompt based on the expense data
-    let prompt = `Analyze the attached customer transaction data to pinpoint under-used, duplicative, or low-value subscriptions that could be cancelled with minimal lifestyle impact—but do not display those findings.
+    let prompt = isChat 
+      ? `You are a helpful financial assistant that provides personalized finance advice. The user has asked: "${userQuestion}"
+
+As an AI financial advisor, analyze the attached customer transaction data to provide personalized insights. You have access to:
+
+Monthly Data:
+- Month: ${monthData?.month || 'Current Month'}
+- Total Amount: €${monthData?.totalAmount ? monthData.totalAmount.toFixed(0) : '0'}`
+
+      : `Analyze the attached customer transaction data to pinpoint under-used, duplicative, or low-value subscriptions that could be cancelled with minimal lifestyle impact—but do not display those findings.
 
 If the user has multiple subscriptions within the same service category (e.g., two entertainment platforms), identify this overlap and suggest canceling one of them, based on usage or perceived redundancy. Emphasize that maintaining multiple similar services may offer limited added value, and one can likely meet their needs.
 
@@ -35,12 +47,11 @@ A single, concise, upbeat in-app message that:
 Tone: Friendly, empowering, action-oriented, and urgent—celebrate progress and spotlight opportunity.
 
 Monthly Data:
-- Month: ${monthData.month || 'Current Month'}
-- Total Amount: €${monthData.totalAmount ? monthData.totalAmount.toFixed(0) : '0'}
-`;
+- Month: ${monthData?.month || 'Current Month'}
+- Total Amount: €${monthData?.totalAmount ? monthData.totalAmount.toFixed(0) : '0'}`;
 
     // Add categories information if available
-    if (monthData.categories && monthData.categories.length > 0) {
+    if (monthData?.categories && monthData.categories.length > 0) {
       prompt += `\nTop Spending Categories:\n`;
       monthData.categories.slice(0, 3).forEach(category => {
         prompt += `- ${category.category}: €${category.totalAmount.toFixed(0)}\n`;
@@ -50,7 +61,7 @@ Monthly Data:
 
     // Add month-over-month comparison if available
     if (previousMonth) {
-      const change = ((monthData.totalAmount - previousMonth.totalAmount) / previousMonth.totalAmount) * 100;
+      const change = ((monthData?.totalAmount - previousMonth.totalAmount) / previousMonth.totalAmount) * 100;
       prompt += `\nMonth-over-month total expense change: ${change.toFixed(1)}% (previous month: €${previousMonth.totalAmount.toFixed(0)})`;
       console.log(`\nMonth-over-month total expense change: ${change.toFixed(1)}% (previous month: €${previousMonth.totalAmount.toFixed(0)})`);
     } else {console.log('not previous month data received')}
@@ -67,7 +78,12 @@ Monthly Data:
       });
     } else {console.log('not transaction data received')}
 
-    prompt += `\n\n1 to 2 sentences maximum. Use a friendly, professional tone. No introduction or greeting. No placeholders`;
+    // Adjust prompt based on mode
+    if (isChat) {
+      prompt += `\n\nProvide specific, personalized financial advice that directly answers the user's question based on the data available. If asked about categories not in the data, be honest about what you can see. Keep your response friendly and conversational, but focused on providing practical advice.`;
+    } else {
+      prompt += `\n\n1 to 2 sentences maximum. Use a friendly, professional tone. No introduction or greeting. No placeholders`;
+    }
 
     // Log prompt for debugging
     console.log("Generated prompt with full context");
@@ -81,11 +97,16 @@ Monthly Data:
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a helpful financial assistant that provides concise, personalized financial insights.' },
+          { 
+            role: 'system', 
+            content: isChat 
+              ? 'You are a helpful financial assistant that provides personalized financial insights based on transaction data.' 
+              : 'You are a helpful financial assistant that provides concise, personalized financial insights.' 
+          },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
-        max_tokens: 150,
+        temperature: isChat ? 0.9 : 0.7,
+        max_tokens: isChat ? 500 : 150,
       }),
     });
 
