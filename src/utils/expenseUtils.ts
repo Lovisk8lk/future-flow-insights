@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export type ExpenseTransaction = {
@@ -11,104 +10,75 @@ export type ExpenseTransaction = {
   mcc: string;
 };
 
-// Make sure this matches your database schema
-// Use the hardcoded demo user ID consistently
-const DEMO_USER_ID = "9c9fdff3-26d0-485e-9e28-c98e967c8bdb";
+export const fetchExpensesByUserId = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('banking_sample_data')
+    .select('*')
+    .eq('userId', userId)
+    .eq('type', 'CARD')
 
-export const fetchExpensesByUserId = async (userId: string = DEMO_USER_ID) => {
-  try {
-    console.log("Fetching expenses for user:", userId);
-    
-    // Adjust query to fetch all transactions, not just CARD type
-    const { data, error } = await supabase
-      .from('banking_sample_data')
-      .select('*')
-      .eq('userId', userId);
-
-    if (error) {
-      console.error("Error fetching expenses:", error);
-      return [];
-    }
-
-    console.log(`Fetched ${data?.length || 0} expenses`);
-    return data as ExpenseTransaction[];
-  } catch (error) {
-    console.error("Exception fetching expenses:", error);
+  if (error) {
+    console.error("Error fetching expenses:", error);
     return [];
   }
+
+  return data as ExpenseTransaction[];
 };
 
-export const fetchExpensesByMonth = async (userId: string = DEMO_USER_ID, startDate: string, endDate: string) => {
-  try {
-    console.log(`Fetching expenses between ${startDate} and ${endDate} for user ${userId}`);
-    
-    const { data, error } = await supabase
-      .from('banking_sample_data')
-      .select('*')
-      .eq('userId', userId)
-      .eq('side', 'debt') // Only debt transactions (expenses)
-      .gte('bookingDate', startDate)
-      .lt('bookingDate', endDate);
+export const fetchExpensesByMonth = async (userId: string, startDate: string, endDate: string) => {
+  const { data, error } = await supabase
+    .from('banking_sample_data')
+    .select('*')
+    .eq('userId', userId)
+    .eq('side', 'debt') // Only debt transactions (expenses)
+    .gte('bookingDate', startDate)
+    .lt('bookingDate', endDate);
 
-    if (error) {
-      console.error("Error fetching expenses by month:", error);
-      return [];
-    }
-
-    console.log(`Fetched ${data?.length || 0} expenses for the specified period`);
-    return data as ExpenseTransaction[];
-  } catch (error) {
-    console.error("Exception fetching expenses by month:", error);
+  if (error) {
+    console.error("Error fetching expenses by month:", error);
     return [];
   }
+
+  return data as ExpenseTransaction[];
 };
 
 // Get available months from the data
-export const fetchAvailableMonths = async (userId: string = DEMO_USER_ID) => {
-  try {
-    console.log("Fetching available months for user:", userId);
-    
-    const { data, error } = await supabase
-      .from('banking_sample_data')
-      .select('bookingDate')
-      .eq('userId', userId);
+export const fetchAvailableMonths = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('banking_sample_data')
+    .select('bookingDate')
+    .eq('userId', userId)
+    .order('bookingDate', { ascending: false });
 
-    if (error) {
-      console.error("Error fetching available months:", error);
-      return [];
-    }
-
-    console.log(`Fetched ${data?.length || 0} booking dates for available months`);
-    
-    // Extract unique months from the data
-    const uniqueMonths = new Set();
-    const months = [];
-
-    data.forEach(item => {
-      if (item.bookingDate) {
-        const date = new Date(item.bookingDate);
-        const month = date.getMonth();
-        const year = date.getFullYear();
-        const key = `${year}-${month}`;
-        
-        if (!uniqueMonths.has(key)) {
-          uniqueMonths.add(key);
-          months.push({
-            year,
-            month,
-            label: new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-            value: `${year}-${String(month + 1).padStart(2, '0')}`
-          });
-        }
-      }
-    });
-
-    console.log(`Generated ${months.length} unique months`);
-    return months;
-  } catch (error) {
-    console.error("Exception fetching available months:", error);
+  if (error) {
+    console.error("Error fetching available months:", error);
     return [];
   }
+
+  // Extract unique months from the data
+  const uniqueMonths = new Set();
+  const months = [];
+
+  data.forEach(item => {
+    if (item.bookingDate) {
+      const date = new Date(item.bookingDate);
+      const month = date.getMonth();
+      const year = date.getFullYear();
+      const key = `${year}-${month}`;
+      
+      if (!uniqueMonths.has(key)) {
+        uniqueMonths.add(key);
+        months.push({
+          year,
+          month,
+          label: new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+          value: `${year}-${String(month + 1).padStart(2, '0')}`
+        });
+      }
+    }
+  });
+
+  return months;
 };
 
 // Group expenses by MCC and calculate sums

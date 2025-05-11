@@ -11,11 +11,9 @@ const MainScreen: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <header className="p-5">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">
-            Analytics
-          </h1>
-        </div>
+        <h1 className="text-3xl font-bold">
+          Analytics
+        </h1>
         <TabNavigation />
       </header>
       
@@ -26,6 +24,7 @@ const MainScreen: React.FC = () => {
           <ExpenseOverviewComponent />
         )}
       </main>
+    
     </div>
   );
 };

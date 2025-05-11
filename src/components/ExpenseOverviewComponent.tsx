@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useFinance } from "../contexts/FinanceContext";
 import { fetchExpensesByUserId, ExpenseTransaction, groupExpensesByMonthAndCategory, fetchAvailableMonths } from "../utils/expenseUtils";
@@ -39,7 +38,6 @@ const ExpenseOverviewComponent: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState<boolean>(false);
-  // Use a hardcoded demo user ID for public access
   const userId = "9c9fdff3-26d0-485e-9e28-c98e967c8bdb";
 
   // Preload AI summary as early as possible
@@ -95,39 +93,23 @@ const ExpenseOverviewComponent: React.FC = () => {
   useEffect(() => {
     const loadExpenses = async () => {
       setLoading(true);
-      try {
-        console.log("Starting to load expenses for user:", userId);
-        
-        // Fetch all expenses for the demo user
-        const data = await fetchExpensesByUserId(userId);
-        console.log(`Loaded ${data.length} total transactions`);
-        setTransactions(data);
+      // Fetch all expenses for the user
+      const data = await fetchExpensesByUserId(userId);
+      setTransactions(data);
 
-        // Fetch available months for filtering
-        const months = await fetchAvailableMonths(userId);
-        console.log(`Loaded ${months.length} available months`);
-        setAvailableMonths(months);
+      // Fetch available months for filtering
+      const months = await fetchAvailableMonths(userId);
+      setAvailableMonths(months);
 
-        // Set default month to most recent
-        if (months.length > 0) {
-          console.log(`Setting default month to ${months[0].value}`);
-          setSelectedMonth(months[0].value);
-        }
-
-        // Group by Month and then by Category
-        const monthCategoryGrouped = groupExpensesByMonthAndCategory(data);
-        console.log(`Generated ${monthCategoryGrouped.length} month category groups`);
-        setMonthCategoryGroups(monthCategoryGrouped);
-      } catch (error) {
-        console.error("Error loading expense data:", error);
-        toast({
-          title: "Error loading expenses",
-          description: "Could not load expense data. Please try again later.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
+      // Set default month to most recent
+      if (months.length > 0) {
+        setSelectedMonth(months[0].value);
       }
+
+      // Group by Month and then by Category
+      const monthCategoryGrouped = groupExpensesByMonthAndCategory(data);
+      setMonthCategoryGroups(monthCategoryGrouped);
+      setLoading(false);
     };
     loadExpenses();
   }, []);
