@@ -26,7 +26,7 @@ If the user has multiple subscriptions within the same service category (e.g., t
 
 Output:
 A single, concise, upbeat in-app message that:
-	1.	Encourages the user by highlighting a positive recent spending habit (no numbers).
+	1.	Encourages the user by highlighting a positive recent spending habit.
 	2.	Drives action by naming one specific low-value or duplicative subscription to cancel and hinting at its long-term benefit.
 	3.	Clearly points out when the user subscribes to multiple services in the same category and suggests streamlining to reduce unnecessary spend.
 	4.	Optionally recommends alternatives—other services the user already uses or cost-effective non-digital tools relevant to their city (e.g., transport passes).
@@ -67,7 +67,7 @@ Monthly Data:
       });
     } else {console.log('not transaction data received')}
 
-    prompt += `\n\n1 to 2 sentences maximum. Use a friendly, professional tone. No introduction or greeting.`;
+    prompt += `\n\n1 to 2 sentences maximum. Use a friendly, professional tone. No introduction or greeting. No placeholders`;
 
     // Log prompt for debugging
     console.log("Generated prompt with full context");
