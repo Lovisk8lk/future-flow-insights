@@ -10,6 +10,7 @@ import { Loader2, SendIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ExpenseTransaction, fetchExpensesByUserId, fetchAvailableMonths, groupExpensesByMonthAndCategory } from "@/utils/expenseUtils";
 import { toast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Message = {
   role: "user" | "assistant";
@@ -124,11 +125,11 @@ const AIChatComponent: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col px-5 py-4 h-[calc(100vh-12rem)]">
-      <Card className="flex-1 overflow-hidden flex flex-col">
-        <CardContent className="p-4 flex-1 flex flex-col">
-          <div className="flex-1 overflow-y-auto px-1">
-            <div className="space-y-4">
+    <div className="flex flex-col h-full px-5 py-4">
+      <Card className="flex-1 overflow-hidden flex flex-col h-[calc(100vh-12rem)]">
+        <CardContent className="p-4 flex-1 flex flex-col h-full">
+          <ScrollArea className="flex-1 pr-4">
+            <div className="space-y-4 pb-2">
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -149,7 +150,7 @@ const AIChatComponent: React.FC = () => {
               ))}
               <div ref={messagesEndRef} />
             </div>
-          </div>
+          </ScrollArea>
           
           <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2">
             <Input
