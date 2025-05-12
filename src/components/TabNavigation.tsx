@@ -27,16 +27,6 @@ const TabNavigation: React.FC = () => {
       >
         Expenses
       </button>
-      <button
-        onClick={() => setActiveTab("aichat")}
-        className={`px-6 py-3 text-sm font-medium ${
-          activeTab === "aichat"
-            ? "border-b-2 border-black"
-            : "text-gray-500"
-        }`}
-      >
-        AI Chat
-      </button>
     </div>
   );
 };
